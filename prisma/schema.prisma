@@ -9,3 +9,17 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Job {
+  id String @id
+  actionType String
+  address String
+  status String
+  transactionId String?
+  ticker String
+  amount Int
+  createdAt DateTime @default(now())
+  processedAt DateTime?
+  finishedAt DateTime?
+  updatedAt DateTime @updatedAt
+}
