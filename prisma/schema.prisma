@@ -10,16 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum ActionType {
+  CLAIM_ITEMS
+  TRANSFER_ASSETS
+}
+
 model Job {
   id String @id
-  actionType String
+  actionType ActionType
   address String
-  status String
-  transactionId String?
   ticker String
   amount Int
+  transactionId String?
   createdAt DateTime @default(now())
   processedAt DateTime?
-  finishedAt DateTime?
   updatedAt DateTime @updatedAt
 }
