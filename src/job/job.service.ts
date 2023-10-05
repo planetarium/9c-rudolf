@@ -3,8 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateClaimItemsDto } from './dto/create-claim-items.dto';
 import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
 import { getCurrency } from 'src/utils/currency';
-import { JobStatus } from './job-status.entity';
-import { Job } from '@prisma/client';
+import { getJobStatus } from './job-status.entity';
 
 @Injectable()
 export class JobService {
@@ -15,7 +14,7 @@ export class JobService {
       where: { id },
     });
     const currency = getCurrency(job.ticker);
-    const status = await this.getJobStatus(job);
+    const status = await getJobStatus(job);
 
     return { ...job, status, currency };
   }
@@ -69,13 +68,5 @@ export class JobService {
 
       return { ...job, jobSequence: jobSequence + 1 };
     });
-  }
-
-  private async getJobStatus(job: Job): Promise<JobStatus> {
-    if (job.transactionId === null) return JobStatus.PENDING;
-    if (job.processedAt === null) return JobStatus.PROCESSING;
-
-    // TODO: Check if transaction is confirmed
-    return JobStatus.SUCCESS;
   }
 }
