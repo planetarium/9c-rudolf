@@ -21,9 +21,17 @@ model Job {
   address String
   ticker String
   amount Int
+  transaction Transaction? @relation(fields: [transactionId], references: [id])
   transactionId String?
   createdAt DateTime @default(now())
   startedAt DateTime?
   processedAt DateTime?
   updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id String @id @unique
+  nonce BigInt @unique
+  raw Bytes
+  jobs Job[]
 }
