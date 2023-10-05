@@ -50,7 +50,7 @@ export class JobService {
         },
       });
 
-      const jobSequence = await this.prismaService.job.count({
+      const jobSequence = await tx.job.count({
         where: { createdAt: { lt: job.createdAt }, processedAt: null },
       });
 
