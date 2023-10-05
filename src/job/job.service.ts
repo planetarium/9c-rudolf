@@ -2,10 +2,23 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateClaimItemsDto } from './dto/create-claim-items.dto';
 import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
+import { getCurrency } from 'src/utils/currency';
+import { JobStatus } from './job-status.entity';
+import { Job } from '@prisma/client';
 
 @Injectable()
 export class JobService {
   constructor(private readonly prismaService: PrismaService) {}
+
+  async getJob(id: string) {
+    const job = await this.prismaService.job.findUnique({
+      where: { id },
+    });
+    const currency = getCurrency(job.ticker);
+    const status = await this.getJobStatus(job);
+
+    return { ...job, status, currency };
+  }
 
   async createClaimItems(dto: CreateClaimItemsDto) {
     return await this.prismaService.$transaction(async (tx) => {
@@ -56,5 +69,13 @@ export class JobService {
 
       return { ...job, jobSequence: jobSequence + 1 };
     });
+  }
+
+  private async getJobStatus(job: Job): Promise<JobStatus> {
+    if (job.transactionId === null) return JobStatus.PENDING;
+    if (job.processedAt === null) return JobStatus.PROCESSING;
+
+    // TODO: Check if transaction is confirmed
+    return JobStatus.SUCCESS;
   }
 }
