@@ -5,9 +5,10 @@ import { PrismaModule } from './prisma/prisma.module';
 import { JobModule } from './job/job.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { QueueModule } from './queue/queue.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [PrismaModule, ScheduleModule.forRoot(), JobModule, QueueModule],
+  imports: [PrismaModule, ScheduleModule.forRoot(), JobModule, QueueModule, ConfigModule.forRoot()],
   controllers: [AppController],
   providers: [AppService],
 })
