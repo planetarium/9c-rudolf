@@ -26,6 +26,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/schedule": "^3.0.4",
     "@planetarium/account": "^3.4.0",
+    "@planetarium/account-aws-kms": "^3.5.0",
     "@planetarium/bencodex": "^0.2.2",
     "@planetarium/tx": "^3.4.0",
     "@prisma/client": "^5.3.1",
