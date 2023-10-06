@@ -6,6 +6,7 @@ import { Currency, encodeFungibleAssetValue } from '@planetarium/tx/dist/assets'
 import { Job } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TxService } from 'src/tx/tx.service';
 
 const TX_ACTIONS_SIZE = 50;
 
@@ -19,7 +20,7 @@ const NCG_MINTER = Address.fromHex("0x47d082a115c63e7b58b1532d20e631538eafadde")
 export class QueueService {
   private readonly logger = new Logger(QueueService.name);
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService, private readonly txService: TxService) {}
 
   @Cron('00,10,20,30,40,50 * * * * *')
   async handleCron() {
@@ -32,8 +33,9 @@ export class QueueService {
         take: TX_ACTIONS_SIZE,
       });
       const claimItemsAction = createClaimItemsAction(claimItemJobs);
-      // TODO: Create ClaimItems TX.
-      
+      const claimItemsTx = await this.txService.createTx(claimItemsAction);
+      this.logger.debug("claimItemsTx", claimItemsTx);
+
       const transferAssetJobs: Job[] = await tx.job.findMany({
         where: {
           transactionId: null,
@@ -42,7 +44,8 @@ export class QueueService {
         take: TX_ACTIONS_SIZE,
       });
       const transferAssetsAction = createTransferAssetsAction(transferAssetJobs);
-      // TODO: Create TransferAssets TX.
+      const transferAssetsTx = await this.txService.createTx(transferAssetsAction);
+      this.logger.debug("transferAssetsTx", transferAssetsTx);
     });
   }
 }
