@@ -1,4 +1,5 @@
 import { Job } from '@prisma/client';
+import axios from 'axios';
 
 export enum JobStatus {
   PENDING = 'PENDING',
@@ -9,9 +10,29 @@ export enum JobStatus {
 }
 
 export const getJobStatus = async (job: Job): Promise<JobStatus> => {
-  if (job.transactionId === null) return JobStatus.PENDING;
+  if (job.startedAt === null) return JobStatus.PENDING;
   if (job.processedAt === null) return JobStatus.PROCESSING;
 
-  // TODO: Check if transaction is confirmed
-  return JobStatus.SUCCESS;
+  const { data } = await axios.post(
+    `${process.env.GQL_ENDPOINT}`,
+    JSON.stringify({
+      query: `
+      query {
+        transaction {
+          transactionResult(txId: "${job.transactionId}") {
+            txStatus}}}`,
+    }),
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+  const { txStatus } = data?.data?.transaction?.transactionResult ?? {};
+
+  if (txStatus === 'SUCCESS') return JobStatus.SUCCESS;
+  if (txStatus === 'FAILED') return JobStatus.FAILED;
+  if (txStatus === 'STAGED') return JobStatus.STAGED;
+
+  return JobStatus.PROCESSING;
 };
