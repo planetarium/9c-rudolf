@@ -14,8 +14,6 @@ const { encodeSignedTx, signTx } = esm_bypass_global["@planetarium/tx"];
 const { AwsKmsAccount, KMSClient } = esm_bypass_global['@planetarium/account-aws-kms'];
 const encodeCurrency = esm_bypass_global["@planetarium/tx"].encodeCurrency;
 
-const QUEUE_ADDRESS = Address.fromHex("0x0000000000000000000000000000000000000000");
-const QUEUE_PUBLIC_KEY = PublicKey.fromHex("03c392ee2a8689e3f0ced0c96af6ee514449698b262ec2b56a3e7eadae237af3f0", "compressed");
 const GENESIS_BLOCK_HASH = Buffer.from("4582250d0da33b06779a8475d283d5dd210c683b9b999d74d03fac4f58fa6bce", "hex");
 const SUPER_FUTURE_DATETIME = new Date(2200, 12, 31, 23, 59, 59, 999);
 
@@ -33,26 +31,22 @@ export class TxService {
 
   constructor(private readonly prismaService: PrismaService, private readonly configService: ConfigService) {
     this.account = new AwsKmsAccount(
-        this.configService.getOrThrow("AWS_KMS_KEY_ID"),
+        configService.getOrThrow("AWS_KMS_KEY_ID"),
         PublicKey.fromHex(configService.getOrThrow("AWS_KMS_PUBLIC_KEY"), "uncompressed"),
-        new KMSClient({
-            credentials: {
-                accessKeyId: this.configService.getOrThrow("AWS_KMS_ACCESS_KEY_ID"),
-                secretAccessKey: this.configService.getOrThrow("AWS_KMS_SECRET_ACCESS_KEY"),
-            }
-        })
+        new KMSClient()
     );
   }
 
   async createTx(action: Value): Promise<SignedTx<UnsignedTx>> {
     return await this.prismaService.$transaction(async tx => {
+        const publicKey = PublicKey.fromHex(this.configService.getOrThrow("AWS_KMS_PUBLIC_KEY"), "uncompressed");
         const unsignedTx: UnsignedTx = {
             nonce: await this.#getNextNonce(),
             actions: [action],
-            signer: QUEUE_ADDRESS.toBytes(),
+            signer: Address.deriveFrom(publicKey).toBytes(),
             timestamp: SUPER_FUTURE_DATETIME,
             updatedAddresses: new Set(),
-            publicKey: QUEUE_PUBLIC_KEY.toBytes("uncompressed"),
+            publicKey: publicKey.toBytes("uncompressed"),
             genesisHash: GENESIS_BLOCK_HASH,
             gasLimit: this.assumeGasLimit(action),
             maxGasPrice: {
