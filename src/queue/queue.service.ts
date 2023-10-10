@@ -63,7 +63,7 @@ function createClaimItemsAction(jobs: Job[]) {
     ["values", new BencodexDictionary([
       ["id", guidToBytes(randomUUID())],
       ["cd", jobs.map(job => [
-        Address.fromHex(job.address).toBytes(),
+        Address.fromHex(job.address, true).toBytes(),
         encodeFungibleAssetValue({
           currency: {
             ticker: job.ticker,
@@ -102,7 +102,7 @@ function createTransferAssetsAction(jobs: Job[]) {
     ["values", new BencodexDictionary([
       ["sender", QUEUE_ADDRESS.toBytes()],
       ["recipients", jobs.map(job => [
-        Address.fromHex(job.address).toBytes(),
+        Address.fromHex(job.address, true).toBytes(),
         encodeFungibleAssetValue({
           currency: CURRENCIES[job.ticker],
           rawValue: BigInt(Math.pow(job.amount, 18))
