@@ -9,7 +9,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { createHash } from "node:crypto";
 
 const QUEUE_ADDRESS = Address.fromHex("0x0000000000000000000000000000000000000000");
-const QUEUE_PUBLIC_KEY = PublicKey.fromHex("03c392ee2a8689e3f0ced0c96af6ee514449698b262ec2b56a3e7eadae237af3f0", "uncompressed");
+const QUEUE_PUBLIC_KEY = PublicKey.fromHex("03c392ee2a8689e3f0ced0c96af6ee514449698b262ec2b56a3e7eadae237af3f0", "compressed");
 const GENESIS_BLOCK_HASH = Buffer.from("4582250d0da33b06779a8475d283d5dd210c683b9b999d74d03fac4f58fa6bce", "hex");
 const SUPER_FUTURE_DATETIME = new Date(2200, 12, 31, 23, 59, 59, 999);
 

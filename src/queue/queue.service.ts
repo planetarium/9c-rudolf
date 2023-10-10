@@ -14,7 +14,7 @@ const TX_ACTIONS_SIZE = 50;
 const QUEUE_ADDRESS = Address.fromHex("0x0000000000000000000000000000000000000000");
 
 // FIXME: Get NCG_MINTER from external source (e.g., environment varibles).
-const NCG_MINTER = Address.fromHex("0x47d082a115c63e7b58b1532d20e631538eafadde");
+const NCG_MINTER = Address.fromHex("0x47D082a115c63E7b58B1532d20E631538eaFADde");
 
 @Injectable()
 export class QueueService {
