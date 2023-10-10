@@ -24,7 +24,7 @@ export class QueueService {
   @Cron('00,10,20,30,40,50 * * * * *')
   async handleCron() {
     await this.prismaService.$transaction(async tx => {
-      const claimItemJobs: Job[] = await this.prismaService.job.findMany({
+      const claimItemJobs: Job[] = await tx.job.findMany({
         where: {
           transactionId: null,
           actionType: "CLAIM_ITEMS"
@@ -34,7 +34,7 @@ export class QueueService {
       const claimItemsAction = createClaimItemsAction(claimItemJobs);
       // TODO: Create ClaimItems TX.
       
-      const transferAssetJobs: Job[] = await this.prismaService.job.findMany({
+      const transferAssetJobs: Job[] = await tx.job.findMany({
         where: {
           transactionId: null,
           actionType: "TRANSFER_ASSETS"
