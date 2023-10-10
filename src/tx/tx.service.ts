@@ -84,7 +84,7 @@ export class TxService {
         }
     });
 
-    return tx.nonce;
+    return tx?.nonce || 0n;
   }
 
   assumeGasLimit(action: Value): bigint {
