@@ -113,9 +113,9 @@ function createTransferAssetsAction(jobs: Job[]) {
 }
 
 function guidToBytes(guid) {
-  return guid.split('-').reduce((bytes, section, index) => {
+  return new Uint8Array(guid.split('-').reduce((bytes, section, index) => {
       const bytesInChar = section.match(/.{1,2}/g);
       if (index < 3) bytesInChar.reverse();
       return bytes.concat(bytesInChar.map(byte => parseInt(byte, 16)));
-  }, []);
+  }, []));
 }
