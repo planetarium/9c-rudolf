@@ -1,12 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Account, Address, PublicKey } from '@planetarium/account';
-import { AwsKmsAccount, KMSClient } from '@planetarium/account-aws-kms';
+import type { Account } from '@planetarium/account';
 import { BencodexDictionary, Value, encode } from '@planetarium/bencodex';
-import { Currency } from '@planetarium/tx/dist/assets';
-import { SignedTx, UnsignedTx, encodeSignedTx, signTx } from '@planetarium/tx/dist/tx';
+import type { Currency } from '@planetarium/tx';
+import type { SignedTx, UnsignedTx } from '@planetarium/tx/dist/tx';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createHash } from "node:crypto";
+import esm_bypass_global from 'src/esm_bypass_global';
+
+console.log(esm_bypass_global);
+const { Address, PublicKey } = esm_bypass_global["@planetarium/account"];
+const { encodeSignedTx, signTx } = esm_bypass_global["@planetarium/tx"];
+const { AwsKmsAccount, KMSClient } = esm_bypass_global['@planetarium/account-aws-kms'];
+const encodeCurrency = esm_bypass_global["@planetarium/tx"].encodeCurrency;
 
 const QUEUE_ADDRESS = Address.fromHex("0x0000000000000000000000000000000000000000");
 const QUEUE_PUBLIC_KEY = PublicKey.fromHex("03c392ee2a8689e3f0ced0c96af6ee514449698b262ec2b56a3e7eadae237af3f0", "compressed");

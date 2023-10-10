@@ -1,12 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { Address } from '@planetarium/account';
 import { BencodexDictionary } from '@planetarium/bencodex';
-import { Currency, encodeFungibleAssetValue } from '@planetarium/tx/dist/assets';
+import type { Currency } from '@planetarium/tx';
 import { Job } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
+import esm_bypass_global from 'src/esm_bypass_global';
+
+const Address = esm_bypass_global["@planetarium/account"].Address;
+const encodeCurrency = esm_bypass_global["@planetarium/tx"].encodeCurrency;
+
+function encodeFungibleAssetValue(value) {
+  return [encodeCurrency(value.currency), value.rawValue];
+}
 
 const TX_ACTIONS_SIZE = 50;
 
