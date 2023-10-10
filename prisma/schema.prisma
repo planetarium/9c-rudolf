@@ -23,6 +23,7 @@ model Job {
   amount Int
   transactionId String?
   createdAt DateTime @default(now())
+  startedAt DateTime?
   processedAt DateTime?
   updatedAt DateTime @updatedAt
 }
