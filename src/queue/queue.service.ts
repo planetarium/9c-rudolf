@@ -47,9 +47,13 @@ export class QueueService {
           transactionId: claimItemsTxId,
         },
         where: {
-          id: {
-            in: claimItemJobs.map(job => job.id),
-          },
+          AND: [
+            {
+              id: {
+                in: claimItemJobs.map(job => job.id),
+              },
+            },
+          ],
         },
       });
     });
@@ -71,9 +75,13 @@ export class QueueService {
           transactionId: transferAssetsTxId,
         },
         where: {
-          id: {
-            in: transferAssetJobs.map(job => job.id),
-          },
+          AND: [
+            {
+              id: {
+                in: transferAssetJobs.map(job => job.id),
+              },
+            },
+          ],
         },
       });
     });
