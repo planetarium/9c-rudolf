@@ -14,6 +14,7 @@ import {
   SUPER_FUTURE_DATETIME,
 } from './tx.constants';
 import { ActionService } from './action.service';
+import { Tx } from './tx.entity';
 
 const { Address, PublicKey } = esm_bypass_global['@planetarium/account'];
 const { AwsKmsAccount, KMSClient } =
@@ -48,10 +49,7 @@ export class TxService {
     return await this.createTxWithAction(nonce, action);
   }
 
-  private async createTxWithAction(
-    nonce: bigint,
-    action: Value,
-  ): Promise<[string, SignedTx<UnsignedTx>, Buffer]> {
+  private async createTxWithAction(nonce: bigint, action: Value): Promise<Tx> {
     const publicKey = PublicKey.fromHex(
       this.configService.getOrThrow('AWS_KMS_PUBLIC_KEY'),
       'uncompressed',
@@ -74,10 +72,9 @@ export class TxService {
     const signedTx = await signTx(unsignedTx, this.account);
     const raw = encode(encodeSignedTx(signedTx));
     const rawBuffer = Buffer.from(raw);
+    const id = createHash('sha256').update(raw).digest().toString('hex');
 
-    const txid = createHash('sha256').update(raw).digest().toString('hex');
-
-    return [txid, signedTx, rawBuffer];
+    return { id, body: signedTx, raw: rawBuffer };
   }
 
   private assumeGasLimit(action: Value): bigint {

@@ -43,10 +43,8 @@ export class QueueService {
       const nextNonce = lastTx ? lastTx.nonce + 1n : 0n;
 
       // Create tx
-      const [id, { nonce }, raw] = await this.txService.createTx(
-        nextNonce,
-        jobs,
-      );
+      const { id, body, raw } = await this.txService.createTx(nextNonce, jobs);
+      const { nonce } = body;
       this.logger.debug(`[Job::${actionType}] tx created`, { id, nonce, raw });
 
       // Update jobs
