@@ -40,9 +40,22 @@ export class QueueService {
         take: TX_ACTIONS_SIZE,
       });
       const claimItemsAction = createClaimItemsAction(claimItemJobs);
-      const claimItemsTx = await this.txService.createTx(claimItemsAction);
+      const [claimItemsTxId, claimItemsTx] = await this.txService.createTx(claimItemsAction, tx);
       this.logger.debug("claimItemsTx", claimItemsTx);
 
+      await tx.job.updateMany({
+        data: {
+          transactionId: claimItemsTxId,
+        },
+        where: {
+          id: {
+            in: claimItemJobs.map(job => job.id),
+          },
+        },
+      });
+    });
+
+    await this.prismaService.$transaction(async tx => {
       const transferAssetJobs: Job[] = await tx.job.findMany({
         where: {
           transactionId: null,
@@ -51,8 +64,19 @@ export class QueueService {
         take: TX_ACTIONS_SIZE,
       });
       const transferAssetsAction = createTransferAssetsAction(transferAssetJobs);
-      const transferAssetsTx = await this.txService.createTx(transferAssetsAction);
+      const [transferAssetsTxId, transferAssetsTx] = await this.txService.createTx(transferAssetsAction, tx);
       this.logger.debug("transferAssetsTx", transferAssetsTx);
+
+      await tx.job.updateMany({
+        data: {
+          transactionId: transferAssetsTxId,
+        },
+        where: {
+          id: {
+            in: transferAssetJobs.map(job => job.id),
+          },
+        },
+      });
     });
   }
 }

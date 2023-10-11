@@ -7,6 +7,8 @@ import type { SignedTx, UnsignedTx } from '@planetarium/tx/dist/tx';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createHash } from "node:crypto";
 import esm_bypass_global from 'src/esm_bypass_global';
+import { Prisma, PrismaClient } from '@prisma/client';
+import { DefaultArgs } from '@prisma/client/runtime/library';
 
 console.log(esm_bypass_global);
 const { Address, PublicKey } = esm_bypass_global["@planetarium/account"];
@@ -25,6 +27,8 @@ const MEAD_CURRENCY: Currency = {
     maximumSupply: null,
 } as const;
 
+type PrismaTransactionClient = Omit<PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
+
 @Injectable()
 export class TxService {
   private readonly account: Account;
@@ -37,48 +41,51 @@ export class TxService {
     );
   }
 
-  async createTx(action: Value): Promise<SignedTx<UnsignedTx>> {
-    return await this.prismaService.$transaction(async tx => {
-        const publicKey = PublicKey.fromHex(this.configService.getOrThrow("AWS_KMS_PUBLIC_KEY"), "uncompressed");
-        const unsignedTx: UnsignedTx = {
-            nonce: await this.#getNextNonce(),
-            actions: [action],
-            signer: Address.deriveFrom(publicKey).toBytes(),
-            timestamp: SUPER_FUTURE_DATETIME,
-            updatedAddresses: new Set(),
-            publicKey: publicKey.toBytes("uncompressed"),
-            genesisHash: GENESIS_BLOCK_HASH,
-            gasLimit: this.assumeGasLimit(action),
-            maxGasPrice: {
-                currency: MEAD_CURRENCY,
-                rawValue: BigInt(Math.pow(10, 18)),
-            },
-        };
-    
-        const signedTx = await signTx(unsignedTx, this.account);
-        const raw = encode(encodeSignedTx(signedTx));
+  async createTx(action: Value, tx: PrismaTransactionClient): Promise<[string, SignedTx<UnsignedTx>]> {
+    const publicKey = PublicKey.fromHex(this.configService.getOrThrow("AWS_KMS_PUBLIC_KEY"), "uncompressed");
+    const unsignedTx: UnsignedTx = {
+        nonce: await this.#getNextNonce(tx),
+        actions: [action],
+        signer: Address.deriveFrom(publicKey).toBytes(),
+        timestamp: SUPER_FUTURE_DATETIME,
+        updatedAddresses: new Set(),
+        publicKey: publicKey.toBytes("uncompressed"),
+        genesisHash: GENESIS_BLOCK_HASH,
+        gasLimit: this.assumeGasLimit(action),
+        maxGasPrice: {
+            currency: MEAD_CURRENCY,
+            rawValue: BigInt(Math.pow(10, 18)),
+        },
+    };
 
-        const txid = createHash("sha256").update(raw).digest().toString("hex");
-        await tx.transaction.create({
-            data: {
-                id: txid,
-                nonce: signedTx.nonce,
-                raw: Buffer.from(raw),
-            },
-        });
+    const signedTx = await signTx(unsignedTx, this.account);
+    const raw = encode(encodeSignedTx(signedTx));
 
-        return signedTx;
+    const txid = createHash("sha256").update(raw).digest().toString("hex");
+    console.log(signedTx);
+    await tx.transaction.create({
+        data: {
+            id: txid,
+            nonce: signedTx.nonce,
+            raw: Buffer.from(raw),
+        },
     });
+
+    return [txid, signedTx];
   }
 
-  async #getNextNonce(): Promise<bigint> {
-    const tx = await this.prismaService.transaction.findFirst({
+  async #getNextNonce(tx: PrismaTransactionClient): Promise<bigint> {
+    const lastTx = await tx.transaction.findFirst({
         orderBy: {
             nonce: "desc"
         }
     });
 
-    return tx?.nonce || 0n;
+    if (lastTx === null) {
+        return 0n;
+    }
+
+    return lastTx.nonce + 1n;
   }
 
   assumeGasLimit(action: Value): bigint {
