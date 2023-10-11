@@ -1,4 +1,4 @@
-import { SignedTx, UnsignedTx } from '@planetarium/tx/dist/tx';
+import type { SignedTx, UnsignedTx } from '@planetarium/tx/dist/tx';
 
 export interface Tx {
   id: string;
