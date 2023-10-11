@@ -1,68 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
-import { Job, Prisma, PrismaClient } from '@prisma/client';
-import { DefaultArgs } from '@prisma/client/runtime/library';
-
+import type { Job } from '@prisma/client';
 import type { Account } from '@planetarium/account';
-import type { Currency } from '@planetarium/tx';
 import type { SignedTx, UnsignedTx } from '@planetarium/tx/dist/tx';
 import { BencodexDictionary, Value, encode } from '@planetarium/bencodex';
-
 import { createHash, randomUUID } from 'node:crypto';
 
 import esm_bypass_global from 'src/esm_bypass_global';
+
+import {
+  CURRENCIES,
+  GENESIS_BLOCK_HASH,
+  QUEUE_ADDRESS,
+  SUPER_FUTURE_DATETIME,
+} from './tx.constants';
+import { PrismaTransactionClient } from './tx.types';
 
 const { Address, PublicKey } = esm_bypass_global['@planetarium/account'];
 const { AwsKmsAccount, KMSClient } =
   esm_bypass_global['@planetarium/account-aws-kms'];
 const { encodeCurrency, encodeSignedTx, signTx } =
   esm_bypass_global['@planetarium/tx'];
-
-// FIXME: Get QUEUE_ADDRESS from external source (e.g., environment varibles).
-const QUEUE_ADDRESS = Address.fromHex(
-  '0x0000000000000000000000000000000000000000',
-);
-
-// FIXME: Get NCG_MINTER from external source (e.g., environment varibles).
-const NCG_MINTER = Address.fromHex(
-  '0x47D082a115c63E7b58B1532d20E631538eaFADde',
-);
-
-const GENESIS_BLOCK_HASH = Buffer.from(
-  '4582250d0da33b06779a8475d283d5dd210c683b9b999d74d03fac4f58fa6bce',
-  'hex',
-);
-const SUPER_FUTURE_DATETIME = new Date(2200, 12, 31, 23, 59, 59, 999);
-
-const CURRENCIES: Record<string, Currency> = {
-  NCG: {
-    ticker: 'NCG',
-    decimalPlaces: 2,
-    minters: new Set([NCG_MINTER.toBytes()]),
-    totalSupplyTrackable: false,
-    maximumSupply: null,
-  },
-  CRYSTAL: {
-    ticker: 'CRYSTAL',
-    decimalPlaces: 18,
-    minters: new Set(),
-    totalSupplyTrackable: false,
-    maximumSupply: null,
-  },
-};
-const MEAD_CURRENCY: Currency = {
-  ticker: 'Mead',
-  decimalPlaces: 18,
-  minters: new Set(),
-  totalSupplyTrackable: false,
-  maximumSupply: null,
-} as const;
-
-type PrismaTransactionClient = Omit<
-  PrismaClient<Prisma.PrismaClientOptions, never, DefaultArgs>,
-  '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
->;
 
 @Injectable()
 export class TxService {
@@ -171,7 +129,7 @@ export class TxService {
       genesisHash: GENESIS_BLOCK_HASH,
       gasLimit: this.assumeGasLimit(action),
       maxGasPrice: {
-        currency: MEAD_CURRENCY,
+        currency: CURRENCIES['MEAD'],
         rawValue: BigInt(Math.pow(10, 18)),
       },
     };
