@@ -10,7 +10,15 @@ import { ConfigModule } from '@nestjs/config';
 import { TxModule } from './tx/tx.module';
 
 @Module({
-  imports: [PrismaModule, ScheduleModule.forRoot(), JobModule, TransactionModule, QueueModule, ConfigModule.forRoot(), TxModule],
+  imports: [
+    PrismaModule,
+    ScheduleModule.forRoot(),
+    JobModule,
+    TransactionModule,
+    QueueModule,
+    ConfigModule.forRoot(),
+    TxModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

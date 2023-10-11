@@ -5,6 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [ConfigModule],
   providers: [TxService],
-  exports: [TxService]
+  exports: [TxService],
 })
 export class TxModule {}

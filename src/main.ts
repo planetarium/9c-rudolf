@@ -1,9 +1,17 @@
-import esm_bypass_global from "./esm_bypass_global";
+// eslint-disable @typescript-eslint/no-var-requires
+
+import esm_bypass_global from './esm_bypass_global';
 
 async function bootstrap() {
-  esm_bypass_global["@planetarium/tx"] = await eval('import("@planetarium/tx")');
-  esm_bypass_global["@planetarium/account"] = await eval('import("@planetarium/account")');
-  esm_bypass_global["@planetarium/account-aws-kms"] = await eval('import("@planetarium/account-aws-kms")');
+  esm_bypass_global['@planetarium/tx'] = await eval(
+    'import("@planetarium/tx")',
+  );
+  esm_bypass_global['@planetarium/account'] = await eval(
+    'import("@planetarium/account")',
+  );
+  esm_bypass_global['@planetarium/account-aws-kms'] = await eval(
+    'import("@planetarium/account-aws-kms")',
+  );
 
   const { NestFactory } = require('@nestjs/core');
   const { AppModule } = require('./app.module');
