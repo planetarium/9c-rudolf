@@ -29,7 +29,6 @@ export class QueueService {
 
   constructor(private readonly prismaService: PrismaService, private readonly txService: TxService) {}
 
-  @Cron('00,10,20,30,40,50 * * * * *')
   async handleCron() {
     await this.prismaService.$transaction(async tx => {
       const claimItemJobs: Job[] = await tx.job.findMany({
