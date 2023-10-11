@@ -4,7 +4,6 @@ import type { Account } from '@planetarium/account';
 import { BencodexDictionary, Value, encode } from '@planetarium/bencodex';
 import type { Currency } from '@planetarium/tx';
 import type { SignedTx, UnsignedTx } from '@planetarium/tx/dist/tx';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { createHash } from 'node:crypto';
 import esm_bypass_global from 'src/esm_bypass_global';
 import { Prisma, PrismaClient } from '@prisma/client';
@@ -38,10 +37,7 @@ type PrismaTransactionClient = Omit<
 export class TxService {
   private readonly account: Account;
 
-  constructor(
-    private readonly prismaService: PrismaService,
-    private readonly configService: ConfigService,
-  ) {
+  constructor(private readonly configService: ConfigService) {
     this.account = new AwsKmsAccount(
       configService.getOrThrow('AWS_KMS_KEY_ID'),
       PublicKey.fromHex(
@@ -53,15 +49,15 @@ export class TxService {
   }
 
   async createTx(
+    nonce: bigint,
     action: Value,
-    tx: PrismaTransactionClient,
-  ): Promise<[string, SignedTx<UnsignedTx>]> {
+  ): Promise<[string, SignedTx<UnsignedTx>, Uint8Array]> {
     const publicKey = PublicKey.fromHex(
       this.configService.getOrThrow('AWS_KMS_PUBLIC_KEY'),
       'uncompressed',
     );
     const unsignedTx: UnsignedTx = {
-      nonce: await this.#getNextNonce(tx),
+      nonce,
       actions: [action],
       signer: Address.deriveFrom(publicKey).toBytes(),
       timestamp: SUPER_FUTURE_DATETIME,
@@ -79,15 +75,8 @@ export class TxService {
     const raw = encode(encodeSignedTx(signedTx));
 
     const txid = createHash('sha256').update(raw).digest().toString('hex');
-    await tx.transaction.create({
-      data: {
-        id: txid,
-        nonce: signedTx.nonce,
-        raw: Buffer.from(raw),
-      },
-    });
 
-    return [txid, signedTx];
+    return [txid, signedTx, raw];
   }
 
   async #getNextNonce(tx: PrismaTransactionClient): Promise<bigint> {
@@ -100,8 +89,6 @@ export class TxService {
     if (lastTx === null) {
       return 0n;
     }
-
-    return lastTx.nonce + 1n;
   }
 
   assumeGasLimit(action: Value): bigint {

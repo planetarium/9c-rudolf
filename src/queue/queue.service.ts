@@ -45,11 +45,21 @@ export class QueueService {
         take: TX_ACTIONS_SIZE,
       });
       const claimItemsAction = createClaimItemsAction(claimItemJobs);
-      const [claimItemsTxId, claimItemsTx] = await this.txService.createTx(
-        claimItemsAction,
-        tx,
-      );
+      const lastTx = await tx.transaction.findFirst({
+        orderBy: { nonce: 'desc' },
+      });
+      const nonce = lastTx ? lastTx.nonce + 1n : 0n;
+      const [claimItemsTxId, claimItemsTx, claimItemsRawTx] =
+        await this.txService.createTx(nonce, claimItemsAction);
       this.logger.debug('claimItemsTx', claimItemsTx);
+
+      await tx.transaction.create({
+        data: {
+          id: claimItemsTxId,
+          nonce: claimItemsTx.nonce,
+          raw: Buffer.from(claimItemsRawTx),
+        },
+      });
 
       await tx.job.updateMany({
         data: {
@@ -77,9 +87,21 @@ export class QueueService {
       });
       const transferAssetsAction =
         createTransferAssetsAction(transferAssetJobs);
-      const [transferAssetsTxId, transferAssetsTx] =
-        await this.txService.createTx(transferAssetsAction, tx);
+      const lastTx = await tx.transaction.findFirst({
+        orderBy: { nonce: 'desc' },
+      });
+      const nonce = lastTx ? lastTx.nonce + 1n : 0n;
+      const [transferAssetsTxId, transferAssetsTx, transferAssetRawTx] =
+        await this.txService.createTx(nonce, transferAssetsAction);
       this.logger.debug('transferAssetsTx', transferAssetsTx);
+
+      await tx.transaction.create({
+        data: {
+          id: transferAssetsTxId,
+          nonce: transferAssetsTx.nonce,
+          raw: Buffer.from(transferAssetRawTx),
+        },
+      });
 
       await tx.job.updateMany({
         data: {
