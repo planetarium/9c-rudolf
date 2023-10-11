@@ -51,7 +51,7 @@ export class TxService {
   async createTx(
     nonce: bigint,
     action: Value,
-  ): Promise<[string, SignedTx<UnsignedTx>, Uint8Array]> {
+  ): Promise<[string, SignedTx<UnsignedTx>, Buffer]> {
     const publicKey = PublicKey.fromHex(
       this.configService.getOrThrow('AWS_KMS_PUBLIC_KEY'),
       'uncompressed',
@@ -73,10 +73,11 @@ export class TxService {
 
     const signedTx = await signTx(unsignedTx, this.account);
     const raw = encode(encodeSignedTx(signedTx));
+    const rawBuffer = Buffer.from(raw);
 
     const txid = createHash('sha256').update(raw).digest().toString('hex');
 
-    return [txid, signedTx, raw];
+    return [txid, signedTx, rawBuffer];
   }
 
   async #getNextNonce(tx: PrismaTransactionClient): Promise<bigint> {

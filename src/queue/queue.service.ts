@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { BencodexDictionary } from '@planetarium/bencodex';
 import type { Currency } from '@planetarium/tx';
-import { Job } from '@prisma/client';
+import { ActionType, Job } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
@@ -36,87 +36,50 @@ export class QueueService {
   ) {}
 
   async handleCron() {
-    await this.prismaService.$transaction(async (tx) => {
-      const claimItemJobs: Job[] = await tx.job.findMany({
+    await this.processJob(ActionType.CLAIM_ITEMS);
+    await this.processJob(ActionType.TRANSFER_ASSETS);
+  }
+
+  private async processJob(actionType: ActionType) {
+    await this.prismaService.$transaction(async (prisma) => {
+      this.logger.debug(`[Job::${actionType}] started`);
+
+      // Collect jobs
+      const jobs = await prisma.job.findMany({
         where: {
+          actionType,
           transactionId: null,
-          actionType: 'CLAIM_ITEMS',
         },
         take: TX_ACTIONS_SIZE,
       });
-      const claimItemsAction = createClaimItemsAction(claimItemJobs);
-      const lastTx = await tx.transaction.findFirst({
+      const jobIds = jobs.map((job) => job.id);
+      this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found}`);
+
+      // Get next nonce
+      const lastTx = await prisma.transaction.findFirst({
         orderBy: { nonce: 'desc' },
+        select: { nonce: true },
       });
-      const nonce = lastTx ? lastTx.nonce + 1n : 0n;
-      const [claimItemsTxId, claimItemsTx, claimItemsRawTx] =
-        await this.txService.createTx(nonce, claimItemsAction);
-      this.logger.debug('claimItemsTx', claimItemsTx);
+      const nextNonce = lastTx ? lastTx.nonce + 1n : 0n;
 
-      await tx.transaction.create({
-        data: {
-          id: claimItemsTxId,
-          nonce: claimItemsTx.nonce,
-          raw: Buffer.from(claimItemsRawTx),
-        },
-      });
+      // Create tx
+      const action =
+        actionType === ActionType.CLAIM_ITEMS
+          ? createClaimItemsAction(jobs)
+          : createTransferAssetsAction(jobs);
+      const [id, { nonce }, raw] = await this.txService.createTx(
+        nextNonce,
+        action,
+      );
+      this.logger.debug(`[Job::${actionType}] tx created`, { id, nonce, raw });
 
-      await tx.job.updateMany({
-        data: {
-          transactionId: claimItemsTxId,
-        },
-        where: {
-          AND: [
-            {
-              id: {
-                in: claimItemJobs.map((job) => job.id),
-              },
-            },
-          ],
-        },
+      // Update jobs
+      await prisma.transaction.create({ data: { id, nonce, raw } });
+      await prisma.job.updateMany({
+        data: { transactionId: id },
+        where: { id: { in: jobIds } },
       });
-    });
-
-    await this.prismaService.$transaction(async (tx) => {
-      const transferAssetJobs: Job[] = await tx.job.findMany({
-        where: {
-          transactionId: null,
-          actionType: 'TRANSFER_ASSETS',
-        },
-        take: TX_ACTIONS_SIZE,
-      });
-      const transferAssetsAction =
-        createTransferAssetsAction(transferAssetJobs);
-      const lastTx = await tx.transaction.findFirst({
-        orderBy: { nonce: 'desc' },
-      });
-      const nonce = lastTx ? lastTx.nonce + 1n : 0n;
-      const [transferAssetsTxId, transferAssetsTx, transferAssetRawTx] =
-        await this.txService.createTx(nonce, transferAssetsAction);
-      this.logger.debug('transferAssetsTx', transferAssetsTx);
-
-      await tx.transaction.create({
-        data: {
-          id: transferAssetsTxId,
-          nonce: transferAssetsTx.nonce,
-          raw: Buffer.from(transferAssetRawTx),
-        },
-      });
-
-      await tx.job.updateMany({
-        data: {
-          transactionId: transferAssetsTxId,
-        },
-        where: {
-          AND: [
-            {
-              id: {
-                in: transferAssetJobs.map((job) => job.id),
-              },
-            },
-          ],
-        },
-      });
+      this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });
     });
   }
 }
