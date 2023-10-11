@@ -14,7 +14,6 @@ import {
   QUEUE_ADDRESS,
   SUPER_FUTURE_DATETIME,
 } from './tx.constants';
-import { PrismaTransactionClient } from './tx.types';
 
 const { Address, PublicKey } = esm_bypass_global['@planetarium/account'];
 const { AwsKmsAccount, KMSClient } =
@@ -143,32 +142,18 @@ export class TxService {
     return [txid, signedTx, rawBuffer];
   }
 
-  async #getNextNonce(tx: PrismaTransactionClient): Promise<bigint> {
-    const lastTx = await tx.transaction.findFirst({
-      orderBy: {
-        nonce: 'desc',
-      },
-    });
-
-    if (lastTx === null) {
-      return 0n;
+  private assumeGasLimit(action: Value): bigint {
+    if (!(action instanceof BencodexDictionary) || !action.has('type_id')) {
+      return 1n;
     }
-  }
 
-  assumeGasLimit(action: Value): bigint {
-    if (action instanceof BencodexDictionary && action.has('type_id')) {
-      const typeId = action.get('type_id');
+    const typeId = action.get('type_id');
+    if (typeof typeId !== 'string') {
+      return 1n;
+    }
 
-      if (typeof typeId !== 'string') {
-        return 1n;
-      }
-
-      if (
-        /transfer_asset\d*/.test(typeId) ||
-        /transfer_assets\d*/.test(typeId)
-      ) {
-        return 4n;
-      }
+    if (/transfer_asset\d*/.test(typeId) || /transfer_assets\d*/.test(typeId)) {
+      return 4n;
     }
 
     return 1n;
