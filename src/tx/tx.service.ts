@@ -10,7 +10,6 @@ import esm_bypass_global from 'src/esm_bypass_global';
 import { Prisma, PrismaClient } from '@prisma/client';
 import { DefaultArgs } from '@prisma/client/runtime/library';
 
-console.log(esm_bypass_global);
 const { Address, PublicKey } = esm_bypass_global["@planetarium/account"];
 const { encodeSignedTx, signTx } = esm_bypass_global["@planetarium/tx"];
 const { AwsKmsAccount, KMSClient } = esm_bypass_global['@planetarium/account-aws-kms'];
@@ -62,7 +61,6 @@ export class TxService {
     const raw = encode(encodeSignedTx(signedTx));
 
     const txid = createHash("sha256").update(raw).digest().toString("hex");
-    console.log(signedTx);
     await tx.transaction.create({
         data: {
             id: txid,
