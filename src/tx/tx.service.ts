@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Job } from '@prisma/client';
 import type { Account } from '@planetarium/account';
-import type { SignedTx, UnsignedTx } from '@planetarium/tx/dist/tx';
+import type { UnsignedTx } from '@planetarium/tx/dist/tx';
 import { BencodexDictionary, Value, encode } from '@planetarium/bencodex';
 import { createHash } from 'node:crypto';
 
