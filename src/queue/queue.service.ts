@@ -20,6 +20,28 @@ export class QueueService {
     await this.processJob(ActionType.TRANSFER_ASSETS);
   }
 
+  async handleStagingCron() {
+    const nextTxNonce = await this.txService.getNextNonceFromRemote();
+    const tx = await this.prismaService.transaction.findUnique({
+      where: {
+        nonce: nextTxNonce,
+      },
+      select: {
+        id: true,
+        raw: true,
+      },
+    });
+
+    if (tx === null) {
+      this.logger.log('There is no tx to stage.');
+      return;
+    }
+
+    const { raw, id } = tx;
+    this.logger.debug('Stage', id);
+    await this.txService.stageTx(raw.toString('hex'));
+  }
+
   private async processJob(actionType: ActionType) {
     await this.prismaService.$transaction(async (prisma) => {
       this.logger.debug(`[Job::${actionType}] started`);
@@ -32,8 +54,21 @@ export class QueueService {
         },
         take: TX_ACTIONS_SIZE,
       });
+
       const jobIds = jobs.map((job) => job.id);
-      this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found}`);
+      this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found`);
+
+      await prisma.job.updateMany({
+        data: { startedAt: new Date() },
+        where: { id: { in: jobIds } },
+      });
+
+      this.logger.debug(`[Job::${actionType}] Mark as started.`);
+
+      if (jobs.length === 0) {
+        this.logger.log('There is no jobs to create tx. :D');
+        return;
+      }
 
       // Get next nonce
       const lastTx = await prisma.transaction.findFirst({
@@ -50,7 +85,7 @@ export class QueueService {
       // Update jobs
       await prisma.transaction.create({ data: { id, nonce, raw } });
       await prisma.job.updateMany({
-        data: { transactionId: id },
+        data: { transactionId: id, processedAt: new Date() },
         where: { id: { in: jobIds } },
       });
       this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });

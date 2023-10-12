@@ -10,4 +10,9 @@ export class QueueController {
   async handleCron() {
     await this.queueService.handleCron();
   }
+
+  @Cron('00,10,20,30,40,50 * * * * *')
+  async handleStagingCron() {
+    await this.queueService.handleStagingCron();
+  }
 }

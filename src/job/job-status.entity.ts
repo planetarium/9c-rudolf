@@ -31,7 +31,7 @@ export const getJobStatus = async (job: Job): Promise<JobStatus> => {
   const { txStatus } = data?.data?.transaction?.transactionResult ?? {};
 
   if (txStatus === 'SUCCESS') return JobStatus.SUCCESS;
-  if (txStatus === 'FAILED') return JobStatus.FAILED;
+  if (txStatus === 'FAILURE') return JobStatus.FAILED;
   if (txStatus === 'STAGED') return JobStatus.STAGED;
 
   return JobStatus.PROCESSING;

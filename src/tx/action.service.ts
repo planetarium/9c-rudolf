@@ -13,7 +13,7 @@ const { encodeCurrency } = esm_bypass_global['@planetarium/tx'];
 @Injectable()
 export class ActionService {
   public buildAction(jobs: Job[]) {
-    if (jobs.every((job) => job.actionType === jobs[0].actionType)) {
+    if (!jobs.every((job) => job.actionType === jobs[0].actionType)) {
       throw new Error('All jobs must have the same action type');
     }
 
@@ -39,7 +39,10 @@ export class ActionService {
               Address.fromHex(job.address, true).toBytes(),
               this.encodeFungibleAssetValue({
                 currency: CURRENCIES[job.ticker],
-                rawValue: BigInt(Math.pow(job.amount, 18)),
+                rawValue: BigInt(
+                  job.amount *
+                    Math.pow(10, CURRENCIES[job.ticker].decimalPlaces),
+                ),
               }),
             ]),
           ],
@@ -67,7 +70,7 @@ export class ActionService {
                   totalSupplyTrackable: true,
                   maximumSupply: null,
                 },
-                rawValue: BigInt(Math.pow(job.amount, 18)),
+                rawValue: BigInt(job.amount * Math.pow(10, 18)),
               }),
             ]),
           ],
