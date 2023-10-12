@@ -54,8 +54,16 @@ export class QueueService {
         },
         take: TX_ACTIONS_SIZE,
       });
+
       const jobIds = jobs.map((job) => job.id);
       this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found`);
+
+      await prisma.job.updateMany({
+        data: { startedAt: new Date() },
+        where: { id: { in: jobIds } },
+      });
+
+      this.logger.debug(`[Job::${actionType}] Mark as started.`);
 
       if (jobs.length === 0) {
         this.logger.log('There is no jobs to create tx. :D');
@@ -77,7 +85,7 @@ export class QueueService {
       // Update jobs
       await prisma.transaction.create({ data: { id, nonce, raw } });
       await prisma.job.updateMany({
-        data: { transactionId: id },
+        data: { transactionId: id, processedAt: new Date() },
         where: { id: { in: jobIds } },
       });
       this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });
