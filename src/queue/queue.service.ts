@@ -35,6 +35,11 @@ export class QueueService {
       const jobIds = jobs.map((job) => job.id);
       this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found}`);
 
+      if (jobs.length === 0) {
+        this.logger.log('There is no jobs to create tx. :D');
+        return;
+      }
+
       // Get next nonce
       const lastTx = await prisma.transaction.findFirst({
         orderBy: { nonce: 'desc' },
