@@ -40,7 +40,7 @@ export class TxService {
   }
 
   public async createTx(nonce: bigint, jobs: Job[]) {
-    if (jobs.every((job) => job.actionType === jobs[0].actionType)) {
+    if (!jobs.every((job) => job.actionType === jobs[0].actionType)) {
       throw new Error('All jobs must have the same action type');
     }
 

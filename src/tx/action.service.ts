@@ -13,7 +13,7 @@ const { encodeCurrency } = esm_bypass_global['@planetarium/tx'];
 @Injectable()
 export class ActionService {
   public buildAction(jobs: Job[]) {
-    if (jobs.every((job) => job.actionType === jobs[0].actionType)) {
+    if (!jobs.every((job) => job.actionType === jobs[0].actionType)) {
       throw new Error('All jobs must have the same action type');
     }
 
