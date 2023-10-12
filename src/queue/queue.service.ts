@@ -55,7 +55,7 @@ export class QueueService {
         take: TX_ACTIONS_SIZE,
       });
       const jobIds = jobs.map((job) => job.id);
-      this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found}`);
+      this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found`);
 
       if (jobs.length === 0) {
         this.logger.log('There is no jobs to create tx. :D');
