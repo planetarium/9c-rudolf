@@ -39,7 +39,10 @@ export class ActionService {
               Address.fromHex(job.address, true).toBytes(),
               this.encodeFungibleAssetValue({
                 currency: CURRENCIES[job.ticker],
-                rawValue: BigInt(Math.pow(job.amount, 18)),
+                rawValue: BigInt(
+                  job.amount *
+                    Math.pow(10, CURRENCIES[job.ticker].decimalPlaces),
+                ),
               }),
             ]),
           ],
@@ -67,7 +70,7 @@ export class ActionService {
                   totalSupplyTrackable: true,
                   maximumSupply: null,
                 },
-                rawValue: BigInt(Math.pow(job.amount, 18)),
+                rawValue: BigInt(job.amount * Math.pow(10, 18)),
               }),
             ]),
           ],
