@@ -20,6 +20,28 @@ export class QueueService {
     await this.processJob(ActionType.TRANSFER_ASSETS);
   }
 
+  async handleStagingCron() {
+    const nextTxNonce = await this.txService.getNextNonceFromRemote();
+    const tx = await this.prismaService.transaction.findUnique({
+      where: {
+        nonce: nextTxNonce,
+      },
+      select: {
+        id: true,
+        raw: true,
+      },
+    });
+
+    if (tx === null) {
+      this.logger.log('There is no tx to stage.');
+      return;
+    }
+
+    const { raw, id } = tx;
+    this.logger.debug('Stage', id);
+    await this.txService.stageTx(raw.toString('hex'));
+  }
+
   private async processJob(actionType: ActionType) {
     await this.prismaService.$transaction(async (prisma) => {
       this.logger.debug(`[Job::${actionType}] started`);

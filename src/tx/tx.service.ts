@@ -15,6 +15,7 @@ import {
 } from './tx.constants';
 import { ActionService } from './action.service';
 import { Tx } from './tx.entity';
+import axios from 'axios';
 
 const { Address, PublicKey } = esm_bypass_global['@planetarium/account'];
 const { AwsKmsAccount, KMSClient } =
@@ -24,6 +25,7 @@ const { encodeSignedTx, signTx } = esm_bypass_global['@planetarium/tx'];
 @Injectable()
 export class TxService {
   private readonly account: Account;
+  private readonly graphqlEndpoint: string;
 
   constructor(
     private readonly configService: ConfigService,
@@ -37,6 +39,7 @@ export class TxService {
       ),
       new KMSClient(),
     );
+    this.graphqlEndpoint = configService.getOrThrow('NC_GRAPHQL_ENDPOINT');
   }
 
   public async createTx(nonce: bigint, jobs: Job[]) {
@@ -47,6 +50,40 @@ export class TxService {
     const action = this.actionBuilder.buildAction(jobs);
 
     return await this.createTxWithAction(nonce, action);
+  }
+
+  async stageTx(unverifiedTransaction: string) {
+    await axios.post(this.graphqlEndpoint, {
+      query: `
+        mutation StageTransaction($payload: String!) {
+          stageTransaction(payload: $payload)
+        }`,
+      operationName: 'StageTransaction',
+      variables: {
+        payload: unverifiedTransaction,
+      },
+    });
+  }
+
+  async getNextNonceFromRemote(): Promise<number> {
+    const resp = await axios.post(this.graphqlEndpoint, {
+      query: `
+        query GetNextNonce($address: Address!) {
+          transaction {
+            nextTxNonce(address: $address)
+          }
+        }`,
+      operationName: 'GetNextNonce',
+      variables: {
+        address: await this.account.getAddress().then((x) => x.toString()),
+      },
+    });
+    const returnValue = resp.data.data.transaction.nextTxNonce;
+    if (typeof returnValue !== 'number') {
+      throw new Error('Unexpected response.');
+    }
+
+    return returnValue;
   }
 
   private async createTxWithAction(nonce: bigint, action: Value): Promise<Tx> {
