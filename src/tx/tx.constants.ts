@@ -15,7 +15,7 @@ export const NCG_MINTER = Address.fromHex(
 );
 
 export const GENESIS_BLOCK_HASH = Buffer.from(
-  '4582250d0da33b06779a8475d283d5dd210c683b9b999d74d03fac4f58fa6bce',
+  '4930365a81cc90de4372a68efb2aff4eaf12d2f5383903f9ccbb535df4ffe566',
   'hex',
 );
 
@@ -32,14 +32,14 @@ export const CURRENCIES: Record<string, Currency> = {
   CRYSTAL: {
     ticker: 'CRYSTAL',
     decimalPlaces: 18,
-    minters: new Set(),
+    minters: null,
     totalSupplyTrackable: false,
     maximumSupply: null,
   },
   MEAD: {
     ticker: 'Mead',
     decimalPlaces: 18,
-    minters: new Set(),
+    minters: null,
     totalSupplyTrackable: false,
     maximumSupply: null,
   },
