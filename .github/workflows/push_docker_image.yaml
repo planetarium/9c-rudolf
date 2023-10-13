@@ -36,5 +36,5 @@ jobs:
       - name: build-and-push
         run: |
           docker buildx build . \
-            --platform linux/arm64v8,linux/amd
+            --platform linux/arm64v8,linux/amd64
           docker push ${{ matrix.docker.repo }}:git-${{ github.sha }}
