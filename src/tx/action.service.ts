@@ -5,14 +5,15 @@ import { randomUUID } from 'node:crypto';
 
 import esm_bypass_global from 'src/esm_bypass_global';
 
-import { CURRENCIES, QUEUE_ADDRESS } from './tx.constants';
+import { CURRENCIES } from './tx.constants';
+import type { Address as AddressType } from '@planetarium/account';
 
 const { Address } = esm_bypass_global['@planetarium/account'];
 const { encodeCurrency } = esm_bypass_global['@planetarium/tx'];
 
 @Injectable()
 export class ActionService {
-  public buildAction(jobs: Job[]) {
+  public buildAction(signer: AddressType, jobs: Job[]) {
     if (!jobs.every((job) => job.actionType === jobs[0].actionType)) {
       throw new Error('All jobs must have the same action type');
     }
@@ -21,18 +22,18 @@ export class ActionService {
     const action =
       actionType === 'CLAIM_ITEMS'
         ? this.buildClaimItemsAction(jobs)
-        : this.buildTransferAssetsAction(jobs);
+        : this.buildTransferAssetsAction(signer, jobs);
 
     return action;
   }
 
-  public buildTransferAssetsAction(jobs: Job[]) {
+  public buildTransferAssetsAction(signer: AddressType, jobs: Job[]) {
     return new BencodexDictionary([
       ['type_id', 'transfer_assets'],
       [
         'values',
         new BencodexDictionary([
-          ['sender', QUEUE_ADDRESS.toBytes()],
+          ['sender', signer.toBytes()],
           [
             'recipients',
             jobs.map((job) => [
@@ -62,16 +63,18 @@ export class ActionService {
             'cd',
             jobs.map((job) => [
               Address.fromHex(job.address, true).toBytes(),
-              this.encodeFungibleAssetValue({
-                currency: {
-                  ticker: job.ticker,
-                  decimalPlaces: 18,
-                  minters: new Set(),
-                  totalSupplyTrackable: true,
-                  maximumSupply: null,
-                },
-                rawValue: BigInt(job.amount * Math.pow(10, 18)),
-              }),
+              [
+                this.encodeFungibleAssetValue({
+                  currency: {
+                    ticker: job.ticker,
+                    decimalPlaces: 0,
+                    minters: null,
+                    totalSupplyTrackable: false,
+                    maximumSupply: null,
+                  },
+                  rawValue: BigInt(job.amount),
+                }),
+              ],
             ]),
           ],
         ]),

@@ -42,6 +42,16 @@ const Currencies: Currency[] = [
     recipient: 'avatar',
     value: 'soulstone_',
   },
+  {
+    type: 'prefix',
+    recipient: 'avatar',
+    value: 'Item_T_',
+  },
+  {
+    type: 'prefix',
+    recipient: 'avatar',
+    value: 'Item_NT_',
+  },
 ];
 
 export const getCurrency = (ticker: string): Currency | null => {

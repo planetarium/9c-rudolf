@@ -80,7 +80,11 @@ export class QueueService {
       // Create tx
       const { id, body, raw } = await this.txService.createTx(nextNonce, jobs);
       const { nonce } = body;
-      this.logger.debug(`[Job::${actionType}] tx created`, { id, nonce, raw });
+      this.logger.debug(`[Job::${actionType}] tx created`, {
+        id,
+        nonce,
+        raw: raw.toString('hex'),
+      });
 
       // Update jobs
       await prisma.transaction.create({ data: { id, nonce, raw } });
