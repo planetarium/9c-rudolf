@@ -29,8 +29,12 @@ jobs:
           docker run --rm --privileged multiarch/qemu-user-static \
             --reset \
             -p yes
+      - name: setup-docker-buildx
+        run: |
+          docker buildx create --use --name mybuild node-amd64
+          docker buildx create --append --name mybuild node-arm64
       - name: build-and-push
         run: |
           docker buildx build . \
-            --platform linux/arm64v8,linux/amd
+            --platform linux/arm64v8,linux/amd64
           docker push ${{ matrix.docker.repo }}:git-${{ github.sha }}
