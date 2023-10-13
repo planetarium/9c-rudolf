@@ -47,7 +47,8 @@ export class TxService {
       throw new Error('All jobs must have the same action type');
     }
 
-    const action = this.actionBuilder.buildAction(jobs);
+    const signerAddress = await this.account.getAddress();
+    const action = this.actionBuilder.buildAction(signerAddress, jobs);
 
     return await this.createTxWithAction(nonce, action);
   }
