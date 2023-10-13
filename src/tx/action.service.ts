@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 
 import esm_bypass_global from 'src/esm_bypass_global';
 
-import { CURRENCIES, QUEUE_ADDRESS } from './tx.constants';
+import { CURRENCIES } from './tx.constants';
 import type { Address as AddressType } from '@planetarium/account';
 
 const { Address } = esm_bypass_global['@planetarium/account'];

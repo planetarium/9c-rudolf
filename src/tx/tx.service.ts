@@ -8,11 +8,7 @@ import { createHash } from 'node:crypto';
 
 import esm_bypass_global from 'src/esm_bypass_global';
 
-import {
-  CURRENCIES,
-  GENESIS_BLOCK_HASH,
-  SUPER_FUTURE_DATETIME,
-} from './tx.constants';
+import { CURRENCIES, SUPER_FUTURE_DATETIME } from './tx.constants';
 import { ActionService } from './action.service';
 import { Tx } from './tx.entity';
 import axios from 'axios';
@@ -88,6 +84,10 @@ export class TxService {
   }
 
   private async createTxWithAction(nonce: bigint, action: Value): Promise<Tx> {
+    const genesisHash = Buffer.from(
+      this.configService.getOrThrow<string>('GENESIS_BLOCK_HASH'),
+      'hex',
+    );
     const publicKey = PublicKey.fromHex(
       this.configService.getOrThrow('AWS_KMS_PUBLIC_KEY'),
       'uncompressed',
@@ -99,7 +99,7 @@ export class TxService {
       timestamp: SUPER_FUTURE_DATETIME,
       updatedAddresses: new Set(),
       publicKey: publicKey.toBytes('uncompressed'),
-      genesisHash: GENESIS_BLOCK_HASH,
+      genesisHash: genesisHash,
       gasLimit: this.assumeGasLimit(action),
       maxGasPrice: {
         currency: CURRENCIES['MEAD'],
