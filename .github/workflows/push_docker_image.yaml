@@ -32,4 +32,5 @@ jobs:
         run: |
           docker buildx build . \
             --platform linux/arm64/v8,linux/amd64
-          docker push ${{ matrix.docker.repo }}:git-${{ github.sha }}
+            --tag ${{ matrix.docker.repo }}:git-${{ github.sha }}
+            --push
