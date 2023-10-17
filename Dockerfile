@@ -14,4 +14,4 @@ FROM node:20-alpine
 
 COPY --from=builder /app /app
 
-ENTRYPOINT [ "yarn", "start:prod" ]
+CMD "yarn prisma:deploy && yarn start:prod"
