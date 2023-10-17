@@ -1,8 +1,11 @@
 // eslint-disable @typescript-eslint/no-var-requires
 
+import * as dotenv from 'dotenv';
 import esm_bypass_global from './esm_bypass_global';
 
 async function bootstrap() {
+  dotenv.config();
+
   esm_bypass_global['@planetarium/tx'] = await eval(
     'import("@planetarium/tx")',
   );
