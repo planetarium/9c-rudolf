@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateClaimItemsDto } from './dto/create-claim-items.dto';
 import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
@@ -19,10 +23,12 @@ export class JobService {
         },
       },
     });
+    if (!job) throw new NotFoundException('Job not found');
+
     const execution = job.executions[0] ?? null;
-    const transactionId = execution.transactionId ?? null;
+    const transactionId = execution?.transactionId ?? null;
     const currency = getCurrency(job.ticker);
-    const status = await getJobStatus(job);
+    const status = await getJobStatus(job, transactionId);
 
     return {
       ...job,

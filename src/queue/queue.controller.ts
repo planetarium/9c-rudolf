@@ -11,7 +11,7 @@ export class QueueController {
     await this.queueService.handleCron();
   }
 
-  @Cron('00,10,20,30,40,50 * * * * *')
+  @Cron('05,15,25,35,45,55 * * * * *')
   async handleStagingCron() {
     await this.queueService.handleStagingCron();
   }

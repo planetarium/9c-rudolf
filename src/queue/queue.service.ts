@@ -50,7 +50,7 @@ export class QueueService {
       const jobs = await prisma.job.findMany({
         where: {
           actionType,
-          transactionId: null,
+          executions: { none: {} },
         },
         take: TX_ACTIONS_SIZE,
       });
@@ -89,8 +89,11 @@ export class QueueService {
       // Update jobs
       await prisma.transaction.create({ data: { id, nonce, raw } });
       await prisma.job.updateMany({
-        data: { transactionId: id, processedAt: new Date() },
+        data: { processedAt: new Date() },
         where: { id: { in: jobIds } },
+      });
+      await prisma.jobExecution.createMany({
+        data: [...jobIds.map((jobId) => ({ jobId, transactionId: id }))],
       });
       this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });
     });
