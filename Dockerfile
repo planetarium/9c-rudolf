@@ -14,4 +14,6 @@ FROM node:20-alpine
 
 COPY --from=builder /app /app
 
-CMD "yarn prisma:deploy && yarn start:prod"
+WORKDIR /app
+
+CMD yarn prisma:deploy && yarn start:prod
