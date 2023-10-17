@@ -17,7 +17,6 @@ export class JobController {
       actionType: job.actionType,
       [addressKey]: job.address,
       status: job.status,
-      retries: job.retries,
       transactionId: job.transactionId,
       item: {
         ticker: job.ticker,
