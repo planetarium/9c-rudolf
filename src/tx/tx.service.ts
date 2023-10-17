@@ -27,13 +27,29 @@ export class TxService {
     private readonly configService: ConfigService,
     private readonly actionBuilder: ActionService,
   ) {
+    const nullableAwsAccessKeyId = this.configService.get(
+      'AWS_KMS_ACCESS_KEY_ID',
+    );
+    const nullableAwsSecretAccessKey = this.configService.get(
+      'AWS_KMS_SECRET_ACCESS_KEY',
+    );
     this.account = new AwsKmsAccount(
       configService.getOrThrow('AWS_KMS_KEY_ID'),
       PublicKey.fromHex(
         configService.getOrThrow('AWS_KMS_PUBLIC_KEY'),
         'uncompressed',
       ),
-      new KMSClient(),
+      new KMSClient(
+        nullableAwsAccessKeyId !== undefined &&
+        nullableAwsSecretAccessKey !== undefined
+          ? {
+              credentials: {
+                accessKeyId: nullableAwsAccessKeyId,
+                secretAccessKey: nullableAwsSecretAccessKey,
+              },
+            }
+          : undefined,
+      ),
     );
     this.graphqlEndpoint = configService.getOrThrow('NC_GRAPHQL_ENDPOINT');
   }
