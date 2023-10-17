@@ -9,7 +9,10 @@ export enum JobStatus {
   FAILED = 'FAILED',
 }
 
-export const getJobStatus = async (job: Job): Promise<JobStatus> => {
+export const getJobStatus = async (
+  job: Job,
+  transactionId: string,
+): Promise<JobStatus> => {
   if (job.startedAt === null) return JobStatus.PENDING;
   if (job.processedAt === null) return JobStatus.PROCESSING;
 
@@ -19,7 +22,7 @@ export const getJobStatus = async (job: Job): Promise<JobStatus> => {
       query: `
       query {
         transaction {
-          transactionResult(txId: "${job.transactionId}") {
+          transactionResult(txId: "${transactionId}") {
             txStatus}}}`,
     }),
     {
