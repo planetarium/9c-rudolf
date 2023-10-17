@@ -33,13 +33,14 @@ export class QueueService {
     });
 
     if (tx === null) {
-      this.logger.log('There is no tx to stage.');
+      this.logger.log('[stageTx] There is no tx to stage. :D');
       return;
     }
 
     const { raw, id } = tx;
-    this.logger.debug('Stage', id);
+    this.logger.debug('[stageTx] Try to stage tx', id);
     await this.txService.stageTx(raw.toString('hex'));
+    this.logger.debug('[stageTx] Staged tx', id);
   }
 
   private async processJob(actionType: ActionType) {
@@ -56,7 +57,9 @@ export class QueueService {
       });
 
       if (jobs.length === 0) {
-        this.logger.log('There is no jobs to create tx. :D');
+        this.logger.log(
+          `[Job::${actionType}] There is no jobs to create tx. :D`,
+        );
         return;
       }
 
