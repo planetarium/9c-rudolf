@@ -55,6 +55,11 @@ export class QueueService {
         take: TX_ACTIONS_SIZE,
       });
 
+      if (jobs.length === 0) {
+        this.logger.log('There is no jobs to create tx. :D');
+        return;
+      }
+
       const jobIds = jobs.map((job) => job.id);
       this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found`);
 
@@ -64,11 +69,6 @@ export class QueueService {
       });
 
       this.logger.debug(`[Job::${actionType}] Mark as started.`);
-
-      if (jobs.length === 0) {
-        this.logger.log('There is no jobs to create tx. :D');
-        return;
-      }
 
       // Get next nonce
       const lastTx = await prisma.transaction.findFirst({
