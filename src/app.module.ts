@@ -8,7 +8,6 @@ import { QueueModule } from './queue/queue.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { ConfigModule } from '@nestjs/config';
 import { TxModule } from './tx/tx.module';
-import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -18,7 +17,6 @@ import { CacheModule } from '@nestjs/cache-manager';
     TransactionModule,
     QueueModule,
     ConfigModule.forRoot(),
-    CacheModule.register(),
     TxModule,
   ],
   controllers: [AppController],
