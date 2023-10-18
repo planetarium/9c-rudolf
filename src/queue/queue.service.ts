@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ActionType } from '@prisma/client';
+import { ActionType, Job, Prisma } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
 
 const TX_ACTIONS_SIZE = 50;
+const JOT_RETRY_LIMIT = 5;
 
 @Injectable()
 export class QueueService {
@@ -48,13 +49,24 @@ export class QueueService {
       this.logger.debug(`[Job::${actionType}] started`);
 
       // Collect jobs
-      const jobs = await prisma.job.findMany({
-        where: {
-          actionType,
-          executions: { none: {} },
-        },
-        take: TX_ACTIONS_SIZE,
-      });
+      type JobWithRetries = Job & { retries: number };
+      const jobs = await prisma.$queryRaw<JobWithRetries[]>(Prisma.sql`
+        SELECT j.*, je."retries" retries FROM "Job" j
+        LEFT JOIN "JobExecution" je ON (
+          je."jobId" = j."id"
+          AND NOT EXISTS (
+            SELECT 1 FROM "JobExecution" je1
+            WHERE je1."jobId" = j."id"
+            AND je1."retries" > je."retries"
+          )
+        )
+        LEFT JOIN "Transaction" t ON t."id" = je."transactionId"
+        WHERE j."actionType" = ${actionType}::"ActionType"
+          AND (t."id" IS NULL OR t."lastStatus" = 'FAILURE')
+          AND (je."retries" IS NULL OR je."retries" < ${JOT_RETRY_LIMIT})
+        ORDER BY j."processedAt" IS NULL DESC, j."processedAt" ASC
+        LIMIT ${TX_ACTIONS_SIZE};
+      `);
 
       if (jobs.length === 0) {
         this.logger.log(
@@ -95,8 +107,22 @@ export class QueueService {
         data: { processedAt: new Date() },
         where: { id: { in: jobIds } },
       });
+      console.log(
+        'data',
+        ...jobs.map((job) => ({
+          jobId: job.id,
+          transactionId: id,
+          retries: job.retries,
+        })),
+      );
       await prisma.jobExecution.createMany({
-        data: [...jobIds.map((jobId) => ({ jobId, transactionId: id }))],
+        data: [
+          ...jobs.map((job) => ({
+            jobId: job.id,
+            transactionId: id,
+            retries: (job.retries ?? -1) + 1,
+          })),
+        ],
       });
       this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });
     });
