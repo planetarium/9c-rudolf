@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ActionType } from '@prisma/client';
+import { ActionType, Job, Prisma } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
 
 const TX_ACTIONS_SIZE = 50;
+const JOT_RETRY_LIMIT = 5;
 
 @Injectable()
 export class QueueService {
@@ -33,13 +34,14 @@ export class QueueService {
     });
 
     if (tx === null) {
-      this.logger.log('There is no tx to stage.');
+      this.logger.log('[stageTx] There is no tx to stage. :D');
       return;
     }
 
     const { raw, id } = tx;
-    this.logger.debug('Stage', id);
+    this.logger.debug('[stageTx] Try to stage tx', id);
     await this.txService.stageTx(raw.toString('hex'));
+    this.logger.debug('[stageTx] Staged tx', id);
   }
 
   private async processJob(actionType: ActionType) {
@@ -47,13 +49,31 @@ export class QueueService {
       this.logger.debug(`[Job::${actionType}] started`);
 
       // Collect jobs
-      const jobs = await prisma.job.findMany({
-        where: {
-          actionType,
-          transactionId: null,
-        },
-        take: TX_ACTIONS_SIZE,
-      });
+      type JobWithRetries = Job & { retries: number };
+      const jobs = await prisma.$queryRaw<JobWithRetries[]>(Prisma.sql`
+        SELECT j.*, je."retries" retries FROM "Job" j
+        LEFT JOIN "JobExecution" je ON (
+          je."jobId" = j."id"
+          AND NOT EXISTS (
+            SELECT 1 FROM "JobExecution" je1
+            WHERE je1."jobId" = j."id"
+            AND je1."retries" > je."retries"
+          )
+        )
+        LEFT JOIN "Transaction" t ON t."id" = je."transactionId"
+        WHERE j."actionType" = ${actionType}::"ActionType"
+          AND (t."id" IS NULL OR t."lastStatus" = 'FAILURE')
+          AND (je."retries" IS NULL OR je."retries" < ${JOT_RETRY_LIMIT})
+        ORDER BY j."processedAt" IS NULL DESC, j."processedAt" ASC
+        LIMIT ${TX_ACTIONS_SIZE};
+      `);
+
+      if (jobs.length === 0) {
+        this.logger.log(
+          `[Job::${actionType}] There is no jobs to create tx. :D`,
+        );
+        return;
+      }
 
       const jobIds = jobs.map((job) => job.id);
       this.logger.debug(`[Job::${actionType}] ${jobs.length} jobs found`);
@@ -64,11 +84,6 @@ export class QueueService {
       });
 
       this.logger.debug(`[Job::${actionType}] Mark as started.`);
-
-      if (jobs.length === 0) {
-        this.logger.log('There is no jobs to create tx. :D');
-        return;
-      }
 
       // Get next nonce
       const lastTx = await prisma.transaction.findFirst({
@@ -89,8 +104,25 @@ export class QueueService {
       // Update jobs
       await prisma.transaction.create({ data: { id, nonce, raw } });
       await prisma.job.updateMany({
-        data: { transactionId: id, processedAt: new Date() },
+        data: { processedAt: new Date() },
         where: { id: { in: jobIds } },
+      });
+      console.log(
+        'data',
+        ...jobs.map((job) => ({
+          jobId: job.id,
+          transactionId: id,
+          retries: job.retries,
+        })),
+      );
+      await prisma.jobExecution.createMany({
+        data: [
+          ...jobs.map((job) => ({
+            jobId: job.id,
+            transactionId: id,
+            retries: (job.retries ?? -1) + 1,
+          })),
+        ],
       });
       this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });
     });

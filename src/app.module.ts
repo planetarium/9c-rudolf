@@ -18,7 +18,7 @@ import { CacheModule } from '@nestjs/cache-manager';
     TransactionModule,
     QueueModule,
     ConfigModule.forRoot(),
-    CacheModule.register(),
+    CacheModule.register({ isGlobal: true }),
     TxModule,
   ],
   controllers: [AppController],

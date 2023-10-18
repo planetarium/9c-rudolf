@@ -15,23 +15,49 @@ enum ActionType {
   TRANSFER_ASSETS
 }
 
+enum TxResult {
+  INVALID
+  STAGING
+  SUCCESS
+  FAILURE
+}
+
 model Job {
   id String @id
   actionType ActionType
   address String
   ticker String
   amount Int
-  transaction Transaction? @relation(fields: [transactionId], references: [id])
-  transactionId String?
   createdAt DateTime @default(now())
   startedAt DateTime?
   processedAt DateTime?
   updatedAt DateTime @updatedAt
+
+  executions JobExecution[]
 }
 
 model Transaction {
   id String @id @unique
   nonce BigInt @unique
   raw Bytes
-  jobs Job[]
+  lastStatus TxResult?
+  statusUpdatedAt DateTime @default(now())
+
+  executions JobExecution[]
+}
+
+model JobExecution {
+  jobId String
+  job Job @relation(fields: [jobId], references: [id])
+
+  transactionId String
+  transaction Transaction @relation(fields: [transactionId], references: [id])
+
+  retries Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([jobId, transactionId])
+  @@unique([jobId, retries])
 }
