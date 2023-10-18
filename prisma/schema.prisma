@@ -15,6 +15,13 @@ enum ActionType {
   TRANSFER_ASSETS
 }
 
+enum TxResult {
+  INVALID
+  STAGING
+  SUCCESS
+  FAILURE
+}
+
 model Job {
   id String @id
   actionType ActionType
@@ -33,6 +40,8 @@ model Transaction {
   id String @id @unique
   nonce BigInt @unique
   raw Bytes
+  lastStatus TxResult?
+  statusUpdatedAt DateTime @default(now())
 
   executions JobExecution[]
 }
