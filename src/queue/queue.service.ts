@@ -4,7 +4,7 @@ import { ActionType, Job, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
 
-const TX_ACTIONS_SIZE = 50;
+const TX_ACTIONS_SIZE = 25;
 const JOT_RETRY_LIMIT = 5;
 
 @Injectable()
