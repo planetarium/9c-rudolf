@@ -1695,7 +1695,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@planetarium/account-aws-kms@npm:^3.5.0":
+"@planetarium/account-aws-kms@npm:3.5.0":
   version: 3.5.0
   resolution: "@planetarium/account-aws-kms@npm:3.5.0"
   dependencies:
@@ -1705,6 +1705,19 @@ __metadata:
   peerDependencies:
     "@planetarium/account": ^3.5.0
   checksum: 4d243364b938ff37e683b687c1c25d8049d1064f3426f3fb46fcded67f89ba5191a9ff954e0d5b488328e3f806d7fd3de396e2f3995010437e0a84fff20bd2dc
+  languageName: node
+  linkType: hard
+
+"@planetarium/account-aws-kms@patch:@planetarium/account-aws-kms@npm%3A3.5.0#./.yarn/patches/@planetarium-account-aws-kms-npm-3.5.0-97a98b815e.patch::locator=9c-rudolf%40workspace%3A.":
+  version: 3.5.0
+  resolution: "@planetarium/account-aws-kms@patch:@planetarium/account-aws-kms@npm%3A3.5.0#./.yarn/patches/@planetarium-account-aws-kms-npm-3.5.0-97a98b815e.patch::version=3.5.0&hash=fc9fe5&locator=9c-rudolf%40workspace%3A."
+  dependencies:
+    "@aws-sdk/client-kms": ^3.272.0
+    "@noble/secp256k1": ^1.7.1
+    asn1js: ^3.0.5
+  peerDependencies:
+    "@planetarium/account": ^3.5.0
+  checksum: 0e1d0f8c7b6ec59a5534d9d77f488275d3d52de1de6686debb637b3937c8d14c428b8f5ea466385ea240f4d9c72b7d1ef3e2eddfa9f8e910d58b9d88fd62521b
   languageName: node
   linkType: hard
 
@@ -1725,7 +1738,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@planetarium/tx@npm:^3.4.0":
+"@planetarium/tx@npm:3.4.0":
   version: 3.4.0
   resolution: "@planetarium/tx@npm:3.4.0"
   dependencies:
@@ -1733,6 +1746,17 @@ __metadata:
   peerDependencies:
     "@planetarium/account": ^3.4.0
   checksum: 4dd24a111c9206b71f98fae27d67df538a605af36297ae3521a1a941fbe60d1869af119f66299dceaabbb7f2d0f093b76b1541423137af1d092cb5971641b147
+  languageName: node
+  linkType: hard
+
+"@planetarium/tx@patch:@planetarium/tx@npm%3A3.4.0#./.yarn/patches/@planetarium-tx-npm-3.4.0-d26f037477.patch::locator=9c-rudolf%40workspace%3A.":
+  version: 3.4.0
+  resolution: "@planetarium/tx@patch:@planetarium/tx@npm%3A3.4.0#./.yarn/patches/@planetarium-tx-npm-3.4.0-d26f037477.patch::version=3.4.0&hash=e6e3be&locator=9c-rudolf%40workspace%3A."
+  dependencies:
+    "@planetarium/bencodex": ^0.2.2
+  peerDependencies:
+    "@planetarium/account": ^3.4.0
+  checksum: 727ffe3fa410258544e00e47b6e72c6e423c186fbf739a9df7fb45654e1c989a26cd0022dc3f5ba523ee6adf04403a7372f8ae8a435d16d3136538ab2a44f2b2
   languageName: node
   linkType: hard
 

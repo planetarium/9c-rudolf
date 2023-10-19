@@ -83,6 +83,7 @@
   },
   "packageManager": "yarn@3.6.4",
   "resolutions": {
-    "@planetarium/account-aws-kms@^3.5.0": "patch:@planetarium/account-aws-kms@npm%3A3.5.0#./.yarn/patches/@planetarium-account-aws-kms-npm-3.5.0-97a98b815e.patch"
+    "@planetarium/account-aws-kms@^3.5.0": "patch:@planetarium/account-aws-kms@npm%3A3.5.0#./.yarn/patches/@planetarium-account-aws-kms-npm-3.5.0-97a98b815e.patch",
+    "@planetarium/tx@^3.4.0": "patch:@planetarium/tx@npm%3A3.4.0#./.yarn/patches/@planetarium-tx-npm-3.4.0-d26f037477.patch"
   }
 }
