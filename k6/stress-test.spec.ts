@@ -4,7 +4,7 @@ import { uuidv4 } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 
 export const options = {
   vus: 100000,
-  duration: '1m',
+  duration: '10s',
   rps: 200,
 };
 
