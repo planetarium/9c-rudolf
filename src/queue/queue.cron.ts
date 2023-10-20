@@ -8,7 +8,7 @@ const handleCronLock = 'HANDLE_CRON_LOCK';
 const handleStagingCronLock = 'HANDLE_STAGING_CRON_LOCK';
 
 @Injectable()
-export class QueueController {
+export class QueueCronController {
   constructor(
     private readonly queueService: QueueService,
     @Inject(CACHE_MANAGER)

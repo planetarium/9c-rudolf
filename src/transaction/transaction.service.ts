@@ -3,9 +3,9 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { getJobStatus } from 'src/job/job-status.entity';
+import { getJobStatusFromTxResult } from 'src/job/job-status.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { getTxResult } from 'src/tx/tx.entity';
+import { TxService } from 'src/tx/tx.service';
 
 const UPDATE_TRANSACTIONS_SIZE = 10;
 
@@ -13,7 +13,10 @@ const UPDATE_TRANSACTIONS_SIZE = 10;
 export class TransactionService {
   private readonly logger = new Logger(TransactionService.name);
 
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly txService: TxService,
+  ) {}
 
   async getTransaction(id: string) {
     const transaction = await this.prismaService.transaction.findUnique({
@@ -30,7 +33,8 @@ export class TransactionService {
       );
     }
 
-    const status = await getJobStatus(jobs[0], id);
+    const txResult = await this.txService.getTxResult(id);
+    const status = getJobStatusFromTxResult(txResult);
 
     return { id, status, jobs };
   }
@@ -57,7 +61,9 @@ export class TransactionService {
     }
 
     const results = await Promise.all(
-      transactions.map(async (transaction) => getTxResult(transaction.id)),
+      transactions.map(async (transaction) =>
+        this.txService.getTxResult(transaction.id),
+      ),
     );
     this.logger.debug('[updateTransactionsStatus] Updated txs', results);
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Job } from '@prisma/client';
+import type { Job, TxResult } from '@prisma/client';
 import type { Account } from '@planetarium/account';
 import type { UnsignedTx } from '@planetarium/tx/dist/tx';
 import { BencodexDictionary, Value, encode } from '@planetarium/bencodex';
@@ -11,7 +11,8 @@ import esm_bypass_global from 'src/esm_bypass_global';
 import { CURRENCIES, SUPER_FUTURE_DATETIME } from './tx.constants';
 import { ActionService } from './action.service';
 import { Tx } from './tx.entity';
-import axios from 'axios';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 const { Address, PublicKey } = esm_bypass_global['@planetarium/account'];
 const { AwsKmsAccount, KMSClient } =
@@ -26,6 +27,7 @@ export class TxService {
   constructor(
     private readonly configService: ConfigService,
     private readonly actionBuilder: ActionService,
+    private readonly httpService: HttpService,
   ) {
     const nullableAwsAccessKeyId = this.configService.get(
       'AWS_KMS_ACCESS_KEY_ID',
@@ -66,7 +68,7 @@ export class TxService {
   }
 
   async stageTx(unverifiedTransaction: string) {
-    await axios.post(this.graphqlEndpoint, {
+    const source = this.httpService.post(this.graphqlEndpoint, {
       query: `
         mutation StageTransaction($payload: String!) {
           stageTransaction(payload: $payload)
@@ -76,10 +78,12 @@ export class TxService {
         payload: unverifiedTransaction,
       },
     });
+
+    return await firstValueFrom(source);
   }
 
   async getNextNonceFromRemote(): Promise<number> {
-    const resp = await axios.post(this.graphqlEndpoint, {
+    const responseSource = this.httpService.post(this.graphqlEndpoint, {
       query: `
         query GetNextNonce($address: Address!) {
           transaction {
@@ -91,12 +95,31 @@ export class TxService {
         address: await this.account.getAddress().then((x) => x.toString()),
       },
     });
-    const returnValue = resp.data.data.transaction.nextTxNonce;
+    const response = await firstValueFrom(responseSource);
+    const returnValue = response.data.data.transaction.nextTxNonce;
     if (typeof returnValue !== 'number') {
       throw new Error('Unexpected response.');
     }
 
     return returnValue;
+  }
+
+  async getTxResult(id: string): Promise<TxResult | null> {
+    const query = `
+    query {
+      transaction {
+        transactionResult(txId: "${id}") {
+          txStatus
+        }}}`;
+    const responseSource = this.httpService.post(
+      `${process.env.GQL_ENDPOINT}`,
+      JSON.stringify({ query }),
+    );
+
+    const { data } = await firstValueFrom(responseSource);
+    const { txStatus } = data?.data?.transaction?.transactionResult ?? {};
+
+    return txStatus ?? null;
   }
 
   private async createTxWithAction(nonce: bigint, action: Value): Promise<Tx> {

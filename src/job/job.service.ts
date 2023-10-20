@@ -7,11 +7,16 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateClaimItemsDto } from './dto/create-claim-items.dto';
 import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
 import { getCurrency } from 'src/utils/currency';
-import { getJobStatus } from './job-status.entity';
+import { JobStatus, getJobStatusFromTxResult } from './job-status.entity';
+import { TxService } from 'src/tx/tx.service';
+import { Job } from '@prisma/client';
 
 @Injectable()
 export class JobService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly txService: TxService,
+  ) {}
 
   async getJob(id: string) {
     const job = await this.prismaService.job.findUnique({
@@ -28,7 +33,7 @@ export class JobService {
     const execution = job.executions[0] ?? null;
     const transactionId = execution?.transactionId ?? null;
     const currency = getCurrency(job.ticker);
-    const status = await getJobStatus(job, transactionId);
+    const status = await this.getJobStatus(job, transactionId);
 
     return {
       ...job,
@@ -88,5 +93,14 @@ export class JobService {
 
       return { ...job, jobSequence: jobSequence + 1 };
     });
+  }
+
+  async getJobStatus(job: Job, transactionId: string) {
+    if (job.startedAt === null) return JobStatus.PENDING;
+    if (job.processedAt === null) return JobStatus.PROCESSING;
+
+    const txResult = await this.txService.getTxResult(transactionId);
+
+    return getJobStatusFromTxResult(txResult);
   }
 }
