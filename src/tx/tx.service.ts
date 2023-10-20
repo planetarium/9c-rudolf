@@ -111,12 +111,12 @@ export class TxService {
         transactionResult(txId: "${id}") {
           txStatus
         }}}`;
-    const resposneSource = this.httpService.post(
+    const responseSource = this.httpService.post(
       `${process.env.GQL_ENDPOINT}`,
       JSON.stringify({ query }),
     );
 
-    const { data } = await firstValueFrom(resposneSource);
+    const { data } = await firstValueFrom(responseSource);
     const { txStatus } = data?.data?.transaction?.transactionResult ?? {};
 
     return txStatus ?? null;
