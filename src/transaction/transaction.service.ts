@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import { getJobStatus } from 'src/job/job-status.entity';
+import { getJobStatusFromTxResult } from 'src/job/job-status.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
 
@@ -33,7 +33,8 @@ export class TransactionService {
       );
     }
 
-    const status = await getJobStatus(jobs[0], id);
+    const txResult = await this.txService.getTxResult(id);
+    const status = getJobStatusFromTxResult(txResult);
 
     return { id, status, jobs };
   }
