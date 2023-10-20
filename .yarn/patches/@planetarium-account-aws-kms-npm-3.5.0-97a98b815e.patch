@@ -1,0 +1,31 @@
+diff --git a/dist/AwsKmsAccount.d.ts b/dist/AwsKmsAccount.d.ts
+index c76624bff4756f2e49a35596187540e80645fb23..fe2e47f9c0109466ca2ebee2603c9b3dfae2f793 100644
+--- a/dist/AwsKmsAccount.d.ts
++++ b/dist/AwsKmsAccount.d.ts
+@@ -11,6 +11,6 @@ export declare class AwsKmsAccount implements Account {
+     constructor(keyId: AwsKmsKeyId, publicKey: PublicKey, client: KMSClient);
+     getAddress(): Promise<Address>;
+     getPublicKey(): Promise<PublicKey>;
+-    sign(message: Message): Promise<Signature>;
++    sign(message: Message, isDigest?: boolean = false): Promise<Signature>;
+ }
+ export default AwsKmsAccount;
+diff --git a/dist/index.js b/dist/index.js
+index 1d874de8639dd05b1b0a280ba45296f0e03bde36..bea08c8874ef00447e0b97a80d25dee8029488f7 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -44,11 +44,12 @@ var AwsKmsAccount = class {
+   getPublicKey() {
+     return Promise.resolve(this.publicKey);
+   }
+-  async sign(message) {
++  async sign(message, isDigest) {
+     const cmd = new SignCommand({
+       KeyId: this.keyId,
+       Message: message,
+-      SigningAlgorithm: "ECDSA_SHA_256"
++      MessageType: isDigest ? "DIGEST" : "RAW",
++      SigningAlgorithm: "ECDSA_SHA_256",
+     });
+     const response = await __privateGet(this, _client).send(cmd);
+     if (response.Signature == null)

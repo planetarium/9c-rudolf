@@ -123,7 +123,7 @@ export class TxService {
       },
     };
 
-    const signedTx = await signTx(unsignedTx, this.account);
+    const signedTx = await signTx(unsignedTx, this.account, true);
     const raw = encode(encodeSignedTx(signedTx));
     const rawBuffer = Buffer.from(raw);
     const id = createHash('sha256').update(raw).digest().toString('hex');
