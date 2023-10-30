@@ -19,9 +19,14 @@ async function bootstrap() {
   const { NestFactory } = require('@nestjs/core');
   const { AppModule } = require('./app.module');
   const { ValidationPipe } = require('@nestjs/common');
+  const { HttpResponseMiddleware } = require('./http-response.middleware');
 
   const app = await NestFactory.create(AppModule);
+
   app.useGlobalPipes(new ValidationPipe());
+  const httpResponseMiddleware = app.get(HttpResponseMiddleware);
+  app.use(httpResponseMiddleware.use.bind(httpResponseMiddleware));
+
   await app.listen(3000);
 }
 bootstrap();
