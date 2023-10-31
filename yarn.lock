@@ -19,10 +19,10 @@ __metadata:
     "@nestjs/schedule": ^3.0.4
     "@nestjs/schematics": ^10.0.0
     "@nestjs/testing": ^10.0.0
-    "@planetarium/account": ^3.4.0
-    "@planetarium/account-aws-kms": ^3.5.0
+    "@planetarium/account": ^4.0.0-dev.2023103113710
+    "@planetarium/account-aws-kms": ^4.0.0-dev.2023103113710
     "@planetarium/bencodex": ^0.2.2
-    "@planetarium/tx": ^3.4.0
+    "@planetarium/tx": ^4.0.0-dev.2023103113710
     "@prisma/client": ^5.3.1
     "@types/express": ^4.17.17
     "@types/jest": ^29.5.2
@@ -1717,39 +1717,26 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@planetarium/account-aws-kms@npm:3.5.0":
-  version: 3.5.0
-  resolution: "@planetarium/account-aws-kms@npm:3.5.0"
+"@planetarium/account-aws-kms@npm:^4.0.0-dev.2023103113710":
+  version: 4.0.0-dev.20231030113325
+  resolution: "@planetarium/account-aws-kms@npm:4.0.0-dev.20231030113325"
   dependencies:
     "@aws-sdk/client-kms": ^3.272.0
     "@noble/secp256k1": ^1.7.1
     asn1js: ^3.0.5
   peerDependencies:
-    "@planetarium/account": ^3.5.0
-  checksum: 4d243364b938ff37e683b687c1c25d8049d1064f3426f3fb46fcded67f89ba5191a9ff954e0d5b488328e3f806d7fd3de396e2f3995010437e0a84fff20bd2dc
+    "@planetarium/account": ^4.0.0-dev.20231030113325
+  checksum: dd9e8660f00f74bcfa580b4395b2aee36099472ea4681faaacc9ce4ba52142ca5a2f26ed0e089ebf3fe31756fdb0fdbbb6d522911456ff1f2bdfe90c766cbe8b
   languageName: node
   linkType: hard
 
-"@planetarium/account-aws-kms@patch:@planetarium/account-aws-kms@npm%3A3.5.0#./.yarn/patches/@planetarium-account-aws-kms-npm-3.5.0-97a98b815e.patch::locator=9c-rudolf%40workspace%3A.":
-  version: 3.5.0
-  resolution: "@planetarium/account-aws-kms@patch:@planetarium/account-aws-kms@npm%3A3.5.0#./.yarn/patches/@planetarium-account-aws-kms-npm-3.5.0-97a98b815e.patch::version=3.5.0&hash=fc9fe5&locator=9c-rudolf%40workspace%3A."
-  dependencies:
-    "@aws-sdk/client-kms": ^3.272.0
-    "@noble/secp256k1": ^1.7.1
-    asn1js: ^3.0.5
-  peerDependencies:
-    "@planetarium/account": ^3.5.0
-  checksum: 0e1d0f8c7b6ec59a5534d9d77f488275d3d52de1de6686debb637b3937c8d14c428b8f5ea466385ea240f4d9c72b7d1ef3e2eddfa9f8e910d58b9d88fd62521b
-  languageName: node
-  linkType: hard
-
-"@planetarium/account@npm:^3.4.0":
-  version: 3.6.0
-  resolution: "@planetarium/account@npm:3.6.0"
+"@planetarium/account@npm:^4.0.0-dev.2023103113710":
+  version: 4.0.0-dev.20231030113325
+  resolution: "@planetarium/account@npm:4.0.0-dev.20231030113325"
   dependencies:
     "@noble/hashes": ^1.2.0
     "@noble/secp256k1": ^1.7.1
-  checksum: cfb6ca00e06aa75f7839852c416a63fc8989e4b26e849cd4ff248e07fa8f9baec3059043df9586496e611256b50bec0188287a7a08e021ff28fef123b9dd1eca
+  checksum: 52b563467d082d35a633599a6815441b8cd84341438bd77f7212faf1d65bf5fd76566ae95ad5b408b01ee849e519fd921c0c36654858d8ed131da2873e36a691
   languageName: node
   linkType: hard
 
@@ -1760,25 +1747,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@planetarium/tx@npm:3.4.0":
-  version: 3.4.0
-  resolution: "@planetarium/tx@npm:3.4.0"
+"@planetarium/tx@npm:^4.0.0-dev.2023103113710":
+  version: 4.0.0-dev.20231030113325
+  resolution: "@planetarium/tx@npm:4.0.0-dev.20231030113325"
   dependencies:
     "@planetarium/bencodex": ^0.2.2
   peerDependencies:
-    "@planetarium/account": ^3.4.0
-  checksum: 4dd24a111c9206b71f98fae27d67df538a605af36297ae3521a1a941fbe60d1869af119f66299dceaabbb7f2d0f093b76b1541423137af1d092cb5971641b147
-  languageName: node
-  linkType: hard
-
-"@planetarium/tx@patch:@planetarium/tx@npm%3A3.4.0#./.yarn/patches/@planetarium-tx-npm-3.4.0-d26f037477.patch::locator=9c-rudolf%40workspace%3A.":
-  version: 3.4.0
-  resolution: "@planetarium/tx@patch:@planetarium/tx@npm%3A3.4.0#./.yarn/patches/@planetarium-tx-npm-3.4.0-d26f037477.patch::version=3.4.0&hash=e6e3be&locator=9c-rudolf%40workspace%3A."
-  dependencies:
-    "@planetarium/bencodex": ^0.2.2
-  peerDependencies:
-    "@planetarium/account": ^3.4.0
-  checksum: 727ffe3fa410258544e00e47b6e72c6e423c186fbf739a9df7fb45654e1c989a26cd0022dc3f5ba523ee6adf04403a7372f8ae8a435d16d3136538ab2a44f2b2
+    "@planetarium/account": ^4.0.0-dev.20231030113325
+  checksum: 11b8ec71faf47af5e604fae4ba82beb6bbb009af543c34ffbc2e30fd6082d371f835148bcf669be9c1db0f4fa79ad976e9f4bd5c880156c20967862f17d095b1
   languageName: node
   linkType: hard
 
