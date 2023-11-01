@@ -3,13 +3,11 @@ import { BencodexDictionary } from '@planetarium/bencodex';
 import type { Job } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 
-import esm_bypass_global from 'src/esm_bypass_global';
-
 import { CURRENCIES } from './tx.constants';
 import type { Address as AddressType } from '@planetarium/account';
 
-const { Address } = esm_bypass_global['@planetarium/account'];
-const { encodeCurrency } = esm_bypass_global['@planetarium/tx'];
+import { Address } from '@planetarium/account';
+import { encodeCurrency } from '@planetarium/tx';
 
 @Injectable()
 export class ActionService {
