@@ -112,7 +112,7 @@ export class TxService {
           txStatus
         }}}`;
     const responseSource = this.httpService.post(
-      `${process.env.GQL_ENDPOINT}`,
+      this.graphqlEndpoint,
       JSON.stringify({ query }),
     );
 
