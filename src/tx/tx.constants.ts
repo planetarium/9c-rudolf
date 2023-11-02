@@ -1,8 +1,6 @@
 import type { Currency } from '@planetarium/tx';
 
-import esm_bypass_global from 'src/esm_bypass_global';
-
-const { Address } = esm_bypass_global['@planetarium/account'];
+import { Address } from '@planetarium/account';
 
 // FIXME: Get NCG_MINTER from external source (e.g., environment varibles).
 export const NCG_MINTER = Address.fromHex(process.env.NCG_MINTER);

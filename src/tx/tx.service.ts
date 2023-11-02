@@ -6,18 +6,15 @@ import type { UnsignedTx } from '@planetarium/tx/dist/tx';
 import { BencodexDictionary, Value, encode } from '@planetarium/bencodex';
 import { createHash } from 'node:crypto';
 
-import esm_bypass_global from 'src/esm_bypass_global';
-
 import { CURRENCIES, SUPER_FUTURE_DATETIME } from './tx.constants';
 import { ActionService } from './action.service';
 import { Tx } from './tx.entity';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 
-const { Address, PublicKey } = esm_bypass_global['@planetarium/account'];
-const { AwsKmsAccount, KMSClient } =
-  esm_bypass_global['@planetarium/account-aws-kms'];
-const { encodeSignedTx, signTx } = esm_bypass_global['@planetarium/tx'];
+import { Address, PublicKey } from '@planetarium/account';
+import { AwsKmsAccount, KMSClient } from '@planetarium/account-aws-kms';
+import { encodeSignedTx, signTx } from '@planetarium/tx';
 
 @Injectable()
 export class TxService {
@@ -112,7 +109,7 @@ export class TxService {
           txStatus
         }}}`;
     const responseSource = this.httpService.post(
-      `${process.env.GQL_ENDPOINT}`,
+      this.graphqlEndpoint,
       JSON.stringify({ query }),
     );
 
