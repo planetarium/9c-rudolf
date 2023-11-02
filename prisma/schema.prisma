@@ -61,3 +61,7 @@ model JobExecution {
   @@id([jobId, transactionId])
   @@unique([jobId, retries])
 }
+
+model AuthToken {
+  token String @id
+}
