@@ -35,12 +35,17 @@ export class JobService {
     const currency = getCurrency(job.ticker);
     const status = await this.getJobStatus(job, transactionId);
 
+    const jobSequence = await this.prismaService.job.count({
+      where: { createdAt: { lt: job.createdAt }, processedAt: null },
+    });
+
     return {
       ...job,
       retries: execution?.retries ?? 0,
       transactionId,
       status,
       currency,
+      jobSequence,
     };
   }
 

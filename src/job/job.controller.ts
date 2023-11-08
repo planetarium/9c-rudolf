@@ -22,6 +22,7 @@ export class JobController {
       status: job.status,
       retries: job.retries,
       transactionId: job.transactionId,
+      jobSequence: job.jobSequence,
       item: {
         ticker: job.ticker,
         amount: job.amount,
