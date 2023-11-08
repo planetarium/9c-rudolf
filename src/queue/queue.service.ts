@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ActionType, Job, Prisma } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -10,11 +11,20 @@ const JOT_RETRY_LIMIT = 5;
 @Injectable()
 export class QueueService {
   private readonly logger = new Logger(QueueService.name);
+  private readonly DEFAULT_START_NONCE: bigint;
 
   constructor(
     private readonly prismaService: PrismaService,
     private readonly txService: TxService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    const nullableDefaultStartNonce = configService.get('DEFAULT_START_NONCE');
+    if (typeof nullableDefaultStartNonce === 'string') {
+      this.DEFAULT_START_NONCE = BigInt(nullableDefaultStartNonce);
+    } else {
+      this.DEFAULT_START_NONCE = 0n;
+    }
+  }
 
   async handleCron() {
     await this.processJob(ActionType.CLAIM_ITEMS);
@@ -90,7 +100,10 @@ export class QueueService {
         orderBy: { nonce: 'desc' },
         select: { nonce: true },
       });
-      const nextNonce = lastTx ? lastTx.nonce + 1n : 0n;
+      const nextNonce = bigintMathMax(
+        lastTx ? lastTx.nonce + 1n : 0n,
+        this.DEFAULT_START_NONCE,
+      );
 
       // Create tx
       const { id, body, raw } = await this.txService.createTx(nextNonce, jobs);
@@ -127,4 +140,12 @@ export class QueueService {
       this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });
     });
   }
+}
+
+function bigintMathMax(a: bigint, b: bigint): bigint {
+  if (a > b) {
+    return a;
+  }
+
+  return b;
 }
