@@ -19,19 +19,12 @@ export class QueueService {
     private readonly txService: TxService,
     private readonly configService: ConfigService,
   ) {
-    const nullableDefaultStartNonce = configService.get('DEFAULT_START_NONCE');
-    if (typeof nullableDefaultStartNonce === 'string') {
-      this.DEFAULT_START_NONCE = BigInt(nullableDefaultStartNonce);
-    } else {
-      this.DEFAULT_START_NONCE = 0n;
-    }
-
-    const nullableTxActionsSize = configService.get('TX_ACTIONS_SIZE');
-    if (typeof nullableTxActionsSize === 'string') {
-      this.TX_ACTIONS_SIZE = Number(nullableTxActionsSize);
-    } else {
-      this.TX_ACTIONS_SIZE = DEFAULT_TX_ACTIONS_SIZE;
-    }
+    this.DEFAULT_START_NONCE = BigInt(
+      configService.get('DEFAULT_START_NONCE') ?? 0n,
+    );
+    this.TX_ACTIONS_SIZE = Number(
+      configService.get('TX_ACTIONS_SIZE') ?? DEFAULT_TX_ACTIONS_SIZE,
+    );
   }
 
   async handleCron() {
@@ -151,9 +144,5 @@ export class QueueService {
 }
 
 function bigintMathMax(a: bigint, b: bigint): bigint {
-  if (a > b) {
-    return a;
-  }
-
-  return b;
+  return a > b ? a : b;
 }
