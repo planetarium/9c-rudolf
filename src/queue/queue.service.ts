@@ -1,20 +1,31 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ActionType, Job, Prisma } from '@prisma/client';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
 
-const TX_ACTIONS_SIZE = 25;
+const DEFAULT_TX_ACTIONS_SIZE = 25;
 const JOT_RETRY_LIMIT = 5;
 
 @Injectable()
 export class QueueService {
   private readonly logger = new Logger(QueueService.name);
+  private readonly DEFAULT_START_NONCE: bigint;
+  private readonly TX_ACTIONS_SIZE: number;
 
   constructor(
     private readonly prismaService: PrismaService,
     private readonly txService: TxService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.DEFAULT_START_NONCE = BigInt(
+      configService.get('DEFAULT_START_NONCE') ?? 0n,
+    );
+    this.TX_ACTIONS_SIZE = Number(
+      configService.get('TX_ACTIONS_SIZE') ?? DEFAULT_TX_ACTIONS_SIZE,
+    );
+  }
 
   async handleCron() {
     await this.processJob(ActionType.CLAIM_ITEMS);
@@ -65,7 +76,7 @@ export class QueueService {
           AND (t."id" IS NULL OR t."lastStatus" = 'FAILURE')
           AND (je."retries" IS NULL OR je."retries" < ${JOT_RETRY_LIMIT})
         ORDER BY j."processedAt" IS NULL DESC, j."processedAt" ASC
-        LIMIT ${TX_ACTIONS_SIZE};
+        LIMIT ${this.TX_ACTIONS_SIZE};
       `);
 
       if (jobs.length === 0) {
@@ -90,7 +101,10 @@ export class QueueService {
         orderBy: { nonce: 'desc' },
         select: { nonce: true },
       });
-      const nextNonce = lastTx ? lastTx.nonce + 1n : 0n;
+      const nextNonce = bigintMathMax(
+        lastTx ? lastTx.nonce + 1n : 0n,
+        this.DEFAULT_START_NONCE,
+      );
 
       // Create tx
       const { id, body, raw } = await this.txService.createTx(nextNonce, jobs);
@@ -127,4 +141,8 @@ export class QueueService {
       this.logger.debug(`[Job::${actionType}] tx processed`, { id, jobIds });
     });
   }
+}
+
+function bigintMathMax(a: bigint, b: bigint): bigint {
+  return a > b ? a : b;
 }
