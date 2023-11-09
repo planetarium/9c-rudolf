@@ -5,13 +5,14 @@ import { ActionType, Job, Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
 
-const TX_ACTIONS_SIZE = 25;
+const DEFAULT_TX_ACTIONS_SIZE = 25;
 const JOT_RETRY_LIMIT = 5;
 
 @Injectable()
 export class QueueService {
   private readonly logger = new Logger(QueueService.name);
   private readonly DEFAULT_START_NONCE: bigint;
+  private readonly TX_ACTIONS_SIZE: number;
 
   constructor(
     private readonly prismaService: PrismaService,
@@ -23,6 +24,13 @@ export class QueueService {
       this.DEFAULT_START_NONCE = BigInt(nullableDefaultStartNonce);
     } else {
       this.DEFAULT_START_NONCE = 0n;
+    }
+
+    const nullableTxActionsSize = configService.get('TX_ACTIONS_SIZE');
+    if (typeof nullableTxActionsSize === 'string') {
+      this.TX_ACTIONS_SIZE = Number(nullableTxActionsSize);
+    } else {
+      this.TX_ACTIONS_SIZE = DEFAULT_TX_ACTIONS_SIZE;
     }
   }
 
@@ -75,7 +83,7 @@ export class QueueService {
           AND (t."id" IS NULL OR t."lastStatus" = 'FAILURE')
           AND (je."retries" IS NULL OR je."retries" < ${JOT_RETRY_LIMIT})
         ORDER BY j."processedAt" IS NULL DESC, j."processedAt" ASC
-        LIMIT ${TX_ACTIONS_SIZE};
+        LIMIT ${this.TX_ACTIONS_SIZE};
       `);
 
       if (jobs.length === 0) {
