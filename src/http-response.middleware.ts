@@ -12,6 +12,8 @@ export class HttpResponseMiddleware implements NestMiddleware {
   ) {}
 
   use(req: any, res: any, next: (error?: any) => void) {
+    if (req.url === '/metrics') return next();
+
     this.httpRequestCounter.labels({ method: req.method }).inc();
 
     res.on('finish', () => {
