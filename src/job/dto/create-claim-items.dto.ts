@@ -1,8 +1,9 @@
 import { Type } from 'class-transformer';
 import { IsInt, IsObject, IsString, ValidateNested } from 'class-validator';
+import { IsTicker } from 'src/utils/currency';
 
 class Item {
-  @IsString()
+  @IsTicker()
   public ticker: string;
 
   @IsInt()
