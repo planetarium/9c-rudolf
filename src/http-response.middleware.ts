@@ -1,5 +1,6 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Request, Response } from 'express';
 import { Counter } from 'prom-client';
 
 @Injectable()
@@ -11,14 +12,20 @@ export class HttpResponseMiddleware implements NestMiddleware {
     private readonly httpResponseCounter: Counter<string>,
   ) {}
 
-  use(req: any, res: any, next: (error?: any) => void) {
-    if (req.url === '/metrics') return next();
+  use(req: Request, res: Response, next: (error?: any) => void) {
+    if (req.baseUrl === '/metrics') return next();
 
-    this.httpRequestCounter.labels({ method: req.method }).inc();
+    this.httpRequestCounter
+      .labels({ method: req.method, url: req.baseUrl })
+      .inc();
 
     res.on('finish', () => {
       this.httpResponseCounter
-        .labels({ method: req.method, status_code: res.statusCode })
+        .labels({
+          method: req.method,
+          url: req.baseUrl,
+          status_code: res.statusCode,
+        })
         .inc();
     });
 
