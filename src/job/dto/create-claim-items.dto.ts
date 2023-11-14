@@ -1,5 +1,12 @@
 import { Type } from 'class-transformer';
-import { IsInt, IsObject, IsString, ValidateNested } from 'class-validator';
+import {
+  IsHexadecimal,
+  IsInt,
+  IsObject,
+  IsString,
+  Length,
+  ValidateNested,
+} from 'class-validator';
 import { IsTicker } from 'src/utils/currency';
 
 class Item {
@@ -15,6 +22,8 @@ export class CreateClaimItemsDto {
   public id: string;
 
   @IsString()
+  @IsHexadecimal()
+  @Length(42, 42)
   public avatarAddress: string;
 
   @IsObject()

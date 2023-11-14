@@ -5,6 +5,8 @@ import {
   IsString,
   ValidateIf,
   ValidateNested,
+  IsHexadecimal,
+  Length,
 } from 'class-validator';
 import {
   IsTicker,
@@ -26,10 +28,14 @@ export class CreateTransferAssetsDto {
 
   @ValidateIf((o: CreateTransferAssetsDto) => isAvatarCurrency(o.item.ticker))
   @IsString()
+  @IsHexadecimal()
+  @Length(42, 42)
   public avatarAddress: string;
 
   @ValidateIf((o: CreateTransferAssetsDto) => isAgentCurrency(o.item.ticker))
   @IsString()
+  @IsHexadecimal()
+  @Length(42, 42)
   public agentAddress: string;
 
   @IsObject()
