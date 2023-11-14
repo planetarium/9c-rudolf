@@ -7,10 +7,10 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
-import { IsTicker } from 'src/utils/currency';
+import { IsAvatarCurrency } from 'src/utils/currency';
 
 class Item {
-  @IsTicker()
+  @IsAvatarCurrency()
   public ticker: string;
 
   @IsInt()

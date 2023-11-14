@@ -101,3 +101,41 @@ export const IsTicker =
       },
     });
   };
+
+export const IsAvatarCurrency =
+  (validationOptions?: ValidationOptions) =>
+  (object: object, propertyName: string) => {
+    registerDecorator({
+      name: 'isAvatarCurrency',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: {
+        message: `${propertyName} must be an avatar currency`,
+        ...validationOptions,
+      },
+      validator: {
+        validate(value: string) {
+          return isAvatarCurrency(value);
+        },
+      },
+    });
+  };
+
+export const IsAgentCurrency =
+  (validationOptions?: ValidationOptions) =>
+  (object: object, propertyName: string) => {
+    registerDecorator({
+      name: 'isAgentCurrency',
+      target: object.constructor,
+      propertyName: propertyName,
+      options: {
+        message: `${propertyName} must be an agent currency`,
+        ...validationOptions,
+      },
+      validator: {
+        validate(value: string) {
+          return isAgentCurrency(value);
+        },
+      },
+    });
+  };
