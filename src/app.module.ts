@@ -33,12 +33,12 @@ import { HttpResponseMiddleware } from './http-response.middleware';
     makeCounterProvider({
       name: 'node_http_request_count_total',
       help: 'Total number of HTTP requests',
-      labelNames: ['method'],
+      labelNames: ['method', 'url'],
     }),
     makeCounterProvider({
       name: 'node_http_response_count_total',
       help: 'Total number of HTTP responses',
-      labelNames: ['method', 'status_code'],
+      labelNames: ['method', 'status_code', 'url'],
     }),
     HttpResponseMiddleware,
   ],
