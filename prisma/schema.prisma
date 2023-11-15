@@ -65,3 +65,8 @@ model JobExecution {
 model AuthToken {
   token String @id
 }
+
+model TickerWhitelist {
+  id String @id
+  ticker String @unique
+}
