@@ -27,7 +27,7 @@ export class ActionService {
 
   public buildTransferAssetsAction(signer: AddressType, jobs: Job[]) {
     return new BencodexDictionary([
-      ['type_id', 'transfer_assets'],
+      ['type_id', 'transfer_assets3'],
       [
         'values',
         new BencodexDictionary([
