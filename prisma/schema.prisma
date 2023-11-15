@@ -67,6 +67,6 @@ model AuthToken {
 }
 
 model TickerWhitelist {
-  id String @id
+  id Int @id @default(autoincrement())
   ticker String @unique
 }
