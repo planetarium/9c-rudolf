@@ -1,7 +1,7 @@
 import { ValidationOptions, registerDecorator } from 'class-validator';
 
 type Currency = {
-  type: 'constant' | 'prefix';
+  type: 'constant' | 'prefix' | 'string_prefix';
   recipient: 'agent' | 'avatar';
   value: string;
 };
@@ -52,6 +52,11 @@ const Currencies: Currency[] = [
     recipient: 'avatar',
     value: 'Item_NT_',
   },
+  {
+    type: 'string_prefix',
+    recipient: 'avatar',
+    value: 'FAV__',
+  },
 ];
 
 export const getCurrency = (ticker: string): Currency | null => {
@@ -64,6 +69,9 @@ export const getCurrency = (ticker: string): Currency | null => {
         ticker.startsWith(c.value) &&
         Number.parseInt(ticker.slice(c.value.length)) > 0
       );
+    }
+    if (c.type === 'string_prefix') {
+      return ticker.startsWith(c.value);
     }
     return false;
   });
