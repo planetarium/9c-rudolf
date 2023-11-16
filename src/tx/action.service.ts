@@ -41,7 +41,9 @@ export class ActionService {
                 currency: CURRENCIES[job.ticker],
                 rawValue: BigInt(
                   new Decimal(job.amount)
-                    .times(Math.pow(10, CURRENCIES[job.ticker].decimalPlaces))
+                    .times(
+                      Decimal.pow(10, CURRENCIES[job.ticker].decimalPlaces),
+                    )
                     .toString(),
                 ),
               }),
@@ -76,7 +78,7 @@ export class ActionService {
                     currency,
                     rawValue: BigInt(
                       new Decimal(job.amount)
-                        .times(Math.pow(10, currency.decimalPlaces))
+                        .times(Decimal.pow(10, currency.decimalPlaces))
                         .toString(),
                     ),
                   }),
