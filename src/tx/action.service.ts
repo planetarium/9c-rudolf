@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { BencodexDictionary } from '@planetarium/bencodex';
 import type { Job } from '@prisma/client';
+import { Decimal } from 'decimal.js';
 import { randomUUID } from 'node:crypto';
 
 import { CURRENCIES } from './tx.constants';
@@ -39,8 +40,9 @@ export class ActionService {
               this.encodeFungibleAssetValue({
                 currency: CURRENCIES[job.ticker],
                 rawValue: BigInt(
-                  job.amount *
-                    Math.pow(10, CURRENCIES[job.ticker].decimalPlaces),
+                  new Decimal(job.amount)
+                    .times(Math.pow(10, CURRENCIES[job.ticker].decimalPlaces))
+                    .toString(),
                 ),
               }),
             ]),
@@ -73,7 +75,9 @@ export class ActionService {
                   this.encodeFungibleAssetValue({
                     currency,
                     rawValue: BigInt(
-                      job.amount * Math.pow(10, currency.decimalPlaces),
+                      new Decimal(job.amount)
+                        .times(Math.pow(10, currency.decimalPlaces))
+                        .toString(),
                     ),
                   }),
                 ],
