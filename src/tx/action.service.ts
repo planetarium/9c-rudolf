@@ -59,21 +59,26 @@ export class ActionService {
           ['id', this.guidToBytes(randomUUID())],
           [
             'cd',
-            jobs.map((job) => [
-              Address.fromHex(job.address, true).toBytes(),
-              [
-                this.encodeFungibleAssetValue({
-                  currency: {
-                    ticker: job.ticker,
-                    decimalPlaces: 0,
-                    minters: null,
-                    totalSupplyTrackable: false,
-                    maximumSupply: null,
-                  },
-                  rawValue: BigInt(job.amount),
-                }),
-              ],
-            ]),
+            jobs.map((job) => {
+              const currency = CURRENCIES[job.ticker] ?? {
+                ticker: job.ticker,
+                decimalPlaces: 0,
+                minters: null,
+                totalSupplyTrackable: false,
+                maximumSupply: null,
+              };
+              return [
+                Address.fromHex(job.address, true).toBytes(),
+                [
+                  this.encodeFungibleAssetValue({
+                    currency,
+                    rawValue: BigInt(
+                      job.amount * Math.pow(10, currency.decimalPlaces),
+                    ),
+                  }),
+                ],
+              ];
+            }),
           ],
         ]),
       ],
