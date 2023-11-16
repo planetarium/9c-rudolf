@@ -36,6 +36,7 @@ __metadata:
     cache-manager: ^5.2.4
     class-transformer: ^0.5.1
     class-validator: ^0.14.0
+    decimal.js: ^10.4.3
     eslint: ^8.42.0
     eslint-config-prettier: ^8.8.0
     eslint-plugin-prettier: ^4.2.1
@@ -3935,6 +3936,13 @@ __metadata:
     supports-color:
       optional: true
   checksum: 3dbad3f94ea64f34431a9cbf0bafb61853eda57bff2880036153438f50fb5a84f27683ba0d8e5426bf41a8c6ff03879488120cf5b3a761e77953169c0600a708
+  languageName: node
+  linkType: hard
+
+"decimal.js@npm:^10.4.3":
+  version: 10.4.3
+  resolution: "decimal.js@npm:10.4.3"
+  checksum: 796404dcfa9d1dbfdc48870229d57f788b48c21c603c3f6554a1c17c10195fc1024de338b0cf9e1efe0c7c167eeb18f04548979bcc5fdfabebb7cc0ae3287bae
   languageName: node
   linkType: hard
 
