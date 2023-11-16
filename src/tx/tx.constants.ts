@@ -24,6 +24,13 @@ export const CURRENCIES: Record<string, Currency> = {
     totalSupplyTrackable: false,
     maximumSupply: null,
   },
+  FAV__CRYSTAL: {
+    ticker: 'FAV__CRYSTAL',
+    decimalPlaces: 18,
+    minters: null,
+    totalSupplyTrackable: false,
+    maximumSupply: null,
+  },
   MEAD: {
     ticker: 'Mead',
     decimalPlaces: 18,

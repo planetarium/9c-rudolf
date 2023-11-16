@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 import {
   IsDefined,
   IsHexadecimal,
-  IsInt,
+  IsNumberString,
   IsObject,
   IsString,
   Length,
@@ -16,8 +16,8 @@ class Item {
   public ticker: string;
 
   @IsDefined()
-  @IsInt()
-  public amount: number;
+  @IsNumberString()
+  public amount: string;
 }
 
 export class CreateClaimItemsDto {

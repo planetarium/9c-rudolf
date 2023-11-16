@@ -27,7 +27,7 @@ model Job {
   actionType ActionType
   address String
   ticker String
-  amount Int
+  amount String
   createdAt DateTime @default(now())
   startedAt DateTime?
   processedAt DateTime?

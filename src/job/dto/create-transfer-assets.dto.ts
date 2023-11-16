@@ -1,6 +1,5 @@
 import { Type } from 'class-transformer';
 import {
-  IsInt,
   IsObject,
   IsString,
   ValidateIf,
@@ -8,6 +7,7 @@ import {
   IsHexadecimal,
   Length,
   IsDefined,
+  IsNumberString,
 } from 'class-validator';
 import {
   IsTicker,
@@ -21,8 +21,8 @@ class Item {
   public ticker: string;
 
   @IsDefined()
-  @IsInt()
-  public amount: number;
+  @IsNumberString()
+  public amount: string;
 }
 
 export class CreateTransferAssetsDto {
