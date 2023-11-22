@@ -12,7 +12,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 import {
   PrometheusModule,
   makeCounterProvider,
-  makeGaugeProvider,
 } from '@willsoto/nestjs-prometheus';
 import { HttpResponseMiddleware } from './http-response.middleware';
 
