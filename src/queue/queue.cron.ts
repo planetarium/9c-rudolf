@@ -47,7 +47,7 @@ export class QueueCronController {
     }
   }
 
-  @Cron(CronExpression.EVERY_SECOND)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   async handleSyncPrometheus() {
     const { failedJobs, pendingJobs } = await this.queueService.getJobCounts();
 
