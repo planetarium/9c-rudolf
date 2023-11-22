@@ -12,6 +12,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import {
   PrometheusModule,
   makeCounterProvider,
+  makeGaugeProvider,
 } from '@willsoto/nestjs-prometheus';
 import { HttpResponseMiddleware } from './http-response.middleware';
 
@@ -39,6 +40,14 @@ import { HttpResponseMiddleware } from './http-response.middleware';
       name: 'node_http_response_count_total',
       help: 'Total number of HTTP responses',
       labelNames: ['method', 'status_code', 'url'],
+    }),
+    makeGaugeProvider({
+      name: 'rudolf_remaining_jobs',
+      help: 'Total number of remaining jobs',
+    }),
+    makeGaugeProvider({
+      name: 'rudolf_failed_jobs',
+      help: 'Total number of failed jobs (retry done)',
     }),
     HttpResponseMiddleware,
   ],

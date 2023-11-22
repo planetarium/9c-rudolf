@@ -1,8 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { QueueService } from './queue.service';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Gauge } from 'prom-client';
 
 const handleCronLock = 'HANDLE_CRON_LOCK';
 const handleStagingCronLock = 'HANDLE_STAGING_CRON_LOCK';
@@ -13,6 +15,10 @@ export class QueueCronController {
     private readonly queueService: QueueService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManger: Cache,
+    @InjectMetric('rudolf_remaining_jobs')
+    private readonly remainingJobsGauge: Gauge<string>,
+    @InjectMetric('rudolf_failed_jobs')
+    private readonly failedJobsGauge: Gauge<string>,
   ) {}
 
   @Cron('00,10,20,30,40,50 * * * * *')
@@ -39,5 +45,13 @@ export class QueueCronController {
     } finally {
       await this.cacheManger.set(handleStagingCronLock, false, 30 * 1000);
     }
+  }
+
+  @Cron(CronExpression.EVERY_SECOND)
+  async handleSyncPrometheus() {
+    const { failedJobs, pendingJobs } = await this.queueService.getJobCounts();
+
+    this.remainingJobsGauge.set(pendingJobs);
+    this.failedJobsGauge.set(failedJobs);
   }
 }
