@@ -55,6 +55,21 @@ export class QueueService {
     this.logger.debug('[stageTx] Staged tx', id);
   }
 
+  async getJobCounts() {
+    const pendingJobs = await this.prismaService.job.count({
+      where: { processedAt: null },
+    });
+    const failedJobs = await this.prismaService.job.count({
+      where: {
+        executions: {
+          some: { retries: 5, transaction: { lastStatus: 'FAILURE' } },
+        },
+      },
+    });
+
+    return { pendingJobs, failedJobs };
+  }
+
   private async processJob(actionType: ActionType) {
     await this.prismaService.$transaction(async (prisma) => {
       this.logger.debug(`[Job::${actionType}] started`);
