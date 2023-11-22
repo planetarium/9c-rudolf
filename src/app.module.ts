@@ -41,14 +41,6 @@ import { HttpResponseMiddleware } from './http-response.middleware';
       help: 'Total number of HTTP responses',
       labelNames: ['method', 'status_code', 'url'],
     }),
-    makeGaugeProvider({
-      name: 'rudolf_remaining_jobs',
-      help: 'Total number of remaining jobs',
-    }),
-    makeGaugeProvider({
-      name: 'rudolf_failed_jobs',
-      help: 'Total number of failed jobs (retry done)',
-    }),
     HttpResponseMiddleware,
   ],
 })
