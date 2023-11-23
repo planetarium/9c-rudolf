@@ -18,6 +18,10 @@ import { makeGaugeProvider } from '@willsoto/nestjs-prometheus';
       name: 'rudolf_failed_jobs',
       help: 'Total number of failed jobs (retry done)',
     }),
+    makeGaugeProvider({
+      name: 'rudolf_total_jobs',
+      help: 'Total number of jobs',
+    }),
   ],
 })
 export class QueueModule {}
