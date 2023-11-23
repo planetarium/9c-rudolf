@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -9,10 +10,12 @@ import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
 import { getCurrency } from 'src/utils/currency';
 import { JobStatus, getJobStatusFromTxResult } from './job-status.entity';
 import { TxService } from 'src/tx/tx.service';
-import { Job } from '@prisma/client';
+import { Job, TxResult } from '@prisma/client';
 
 @Injectable()
 export class JobService {
+  private readonly logger = new Logger(JobService.name);
+
   constructor(
     private readonly prismaService: PrismaService,
     private readonly txService: TxService,
@@ -25,6 +28,7 @@ export class JobService {
         executions: {
           orderBy: { createdAt: 'desc' },
           take: 1,
+          include: { transaction: true },
         },
       },
     });
@@ -33,7 +37,8 @@ export class JobService {
     const execution = job.executions[0] ?? null;
     const transactionId = execution?.transactionId ?? null;
     const currency = getCurrency(job.ticker);
-    const status = await this.getJobStatus(job, transactionId);
+    const lastTxStatus = execution?.transaction?.lastStatus;
+    const status = await this.getJobStatus(job, transactionId, lastTxStatus);
 
     const jobSequence = await this.prismaService.job.count({
       where: { createdAt: { lt: job.createdAt }, processedAt: null },
@@ -110,12 +115,23 @@ export class JobService {
     });
   }
 
-  async getJobStatus(job: Job, transactionId: string) {
+  async getJobStatus(job: Job, transactionId: string, lastTxStatus?: TxResult) {
+    if (lastTxStatus === 'SUCCESS') return JobStatus.SUCCESS;
+    if (lastTxStatus === 'FAILURE') return JobStatus.FAILED;
+
     if (job.startedAt === null) return JobStatus.PENDING;
     if (job.processedAt === null) return JobStatus.PROCESSING;
 
-    const txResult = await this.txService.getTxResult(transactionId);
+    try {
+      const txResult = await this.txService.getTxResult(transactionId);
 
-    return getJobStatusFromTxResult(txResult);
+      return getJobStatusFromTxResult(txResult);
+    } catch (error) {
+      this.logger.error('Failed to get tx result from gql.', error);
+
+      if (lastTxStatus) return getJobStatusFromTxResult(lastTxStatus);
+
+      return JobStatus.PROCESSING;
+    }
   }
 }
