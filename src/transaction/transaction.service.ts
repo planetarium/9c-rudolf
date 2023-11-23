@@ -3,6 +3,7 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
+import { TxResult } from '@prisma/client';
 import { getJobStatusFromTxResult } from 'src/job/job-status.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
@@ -33,8 +34,8 @@ export class TransactionService {
       );
     }
 
-    const txResult = await this.txService.getTxResult(id);
-    const status = getJobStatusFromTxResult(txResult);
+    const txStatus = await this.getTxResultWithCache(transaction.lastStatus);
+    const status = getJobStatusFromTxResult(txStatus);
 
     return { id, status, jobs };
   }
@@ -78,5 +79,19 @@ export class TransactionService {
         }),
       ),
     );
+  }
+
+  async getTxResultWithCache(lastStatus: TxResult | null) {
+    try {
+      if (lastStatus === 'SUCCESS' || lastStatus === 'FAILURE') {
+        return lastStatus;
+      }
+
+      return await this.txService.getTxResult(lastStatus);
+    } catch (error) {
+      this.logger.error('Failed to get tx result', error);
+
+      return lastStatus ?? TxResult.INVALID;
+    }
   }
 }
