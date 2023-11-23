@@ -56,6 +56,7 @@ export class QueueService {
   }
 
   async getJobCounts() {
+    const jobs = await this.prismaService.job.count();
     const pendingJobs = await this.prismaService.job.count({
       where: { processedAt: null },
     });
@@ -67,7 +68,7 @@ export class QueueService {
       },
     });
 
-    return { pendingJobs, failedJobs };
+    return { jobs, pendingJobs, failedJobs };
   }
 
   private async processJob(actionType: ActionType) {

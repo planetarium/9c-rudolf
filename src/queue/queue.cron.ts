@@ -15,6 +15,8 @@ export class QueueCronController {
     private readonly queueService: QueueService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManger: Cache,
+    @InjectMetric('rudolf_total_jobs')
+    private readonly totalJobsGauge: Gauge<string>,
     @InjectMetric('rudolf_remaining_jobs')
     private readonly remainingJobsGauge: Gauge<string>,
     @InjectMetric('rudolf_failed_jobs')
@@ -49,8 +51,10 @@ export class QueueCronController {
 
   @Cron(CronExpression.EVERY_5_SECONDS)
   async handleSyncPrometheus() {
-    const { failedJobs, pendingJobs } = await this.queueService.getJobCounts();
+    const { jobs, failedJobs, pendingJobs } =
+      await this.queueService.getJobCounts();
 
+    this.totalJobsGauge.set(jobs);
     this.remainingJobsGauge.set(pendingJobs);
     this.failedJobsGauge.set(failedJobs);
   }
