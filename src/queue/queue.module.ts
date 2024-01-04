@@ -4,9 +4,10 @@ import { QueueCronController } from './queue.cron';
 import { TxModule } from 'src/tx/tx.module';
 import { ConfigModule } from '@nestjs/config';
 import { makeGaugeProvider } from '@willsoto/nestjs-prometheus';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports: [TxModule, ConfigModule],
+  imports: [TxModule, ConfigModule, PrismaModule],
   providers: [
     QueueService,
     QueueCronController,
