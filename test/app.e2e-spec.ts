@@ -1,7 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import * as request from 'supertest';
-import { AppModule } from './../src/app.module';
+import { describe, beforeEach, it, expect } from 'vitest';
+import request from 'supertest';
+import { AppModule } from '../src/app.module';
+import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -20,5 +22,15 @@ describe('AppController (e2e)', () => {
       .get('/')
       .expect(200)
       .expect('Hello World!');
+  });
+
+  it('SQL SELECT 1', async () => {
+    const prisma = app.get(PrismaService);
+    type Result = { result: 1 };
+    const [result] = await prisma.$queryRaw<Result[]>`
+      SELECT 1 result;
+    `;
+
+    expect(result.result).toEqual(1);
   });
 });

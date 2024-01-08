@@ -17,14 +17,15 @@ import { HttpResponseMiddleware } from './http-response.middleware';
 
 @Module({
   imports: [
-    PrismaModule,
     ScheduleModule.forRoot(),
-    JobModule,
-    TransactionModule,
-    QueueModule,
     ConfigModule.forRoot(),
     CacheModule.register({ isGlobal: true }),
     PrometheusModule.register(),
+
+    PrismaModule,
+    JobModule,
+    TransactionModule,
+    QueueModule,
     TxModule,
   ],
   controllers: [AppController],
