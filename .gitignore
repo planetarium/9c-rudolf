@@ -43,3 +43,6 @@ lerna-debug.log*
 # environment
 .env
 .env.*
+
+# test database
+.test
