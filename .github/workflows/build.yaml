@@ -24,6 +24,9 @@ jobs:
       - name: Init test database
         run: docker compose up -d
 
+      - name: Give permissions to test database
+        run: chown -R node:node .test/
+
       - name: Test
         run: yarn test:e2e
 
