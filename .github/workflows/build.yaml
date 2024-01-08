@@ -25,7 +25,7 @@ jobs:
         run: docker compose up -d
 
       - name: Wait for database
-        run: docker compose exec -T db bash -c 'while ! mysqladmin ping --silent; do sleep 1; done'
+        run: docker compose exec postgres bash -c 'while ! pg_isready -h localhost -p 5432 -U postgres; do sleep 1; done;'
 
       - name: Test
         run: yarn test:e2e
