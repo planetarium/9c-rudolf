@@ -24,8 +24,8 @@ jobs:
       - name: Init test database
         run: docker compose up -d
 
-      - name: Give permissions to test database
-        run: chown -R node:node .test/
+      - name: Wait for database
+        run: docker compose exec -T db bash -c 'while ! mysqladmin ping --silent; do sleep 1; done'
 
       - name: Test
         run: yarn test:e2e
