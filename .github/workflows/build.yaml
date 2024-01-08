@@ -21,6 +21,12 @@ jobs:
         shell: bash
         run: yarn install --immutable
 
+      - name: Init test database
+        run: docker compose up -d
+
+      - name: Test
+        run: yarn test:e2e
+
       - name: Build
         run: yarn build
 
