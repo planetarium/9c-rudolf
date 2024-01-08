@@ -25,7 +25,7 @@ jobs:
         run: docker compose up -d
 
       - name: Give permissions to test database
-        run: chown -R 1001:1001 .test/
+        run: sudo chown -R 1001:1001 .test/
 
       - name: Wait for database
         run: docker compose exec db bash -c 'while ! pg_isready -h localhost -p 5432 -U postgres; do sleep 1; done;'
