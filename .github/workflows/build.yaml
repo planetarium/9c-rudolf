@@ -25,7 +25,7 @@ jobs:
         run: mkdir -p .test/db
 
       - name: Give permissions to test database
-        run: sudo chown -R 1001:1001 .test/db
+        run: sudo chown -R $USER .test/db
 
       - name: Init test database
         run: docker compose up -d
