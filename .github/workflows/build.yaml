@@ -21,11 +21,11 @@ jobs:
         shell: bash
         run: yarn install --immutable
 
+      - name: Create database folder
+        run: mkdir -p .test/db
+
       - name: Init test database
         run: docker compose up -d
-
-      - name: Give permissions to test database
-        run: sudo chown -R 1001:1001 .test/
 
       - name: Wait for database
         run: docker compose exec db bash -c 'while ! pg_isready -h localhost -p 5432 -U postgres; do sleep 1; done;'
