@@ -23,36 +23,36 @@ enum TxResult {
 }
 
 model Job {
-  id String @id
-  eventId String?
-  actionType ActionType
-  address String
-  ticker String
-  amount String
-  createdAt DateTime @default(now())
-  startedAt DateTime?
+  id          String     @id
+  eventId     String?
+  actionType  ActionType
+  address     String
+  ticker      String
+  amount      String
+  createdAt   DateTime   @default(now())
+  startedAt   DateTime?
   processedAt DateTime?
-  updatedAt DateTime @updatedAt
+  updatedAt   DateTime   @updatedAt
 
   executions JobExecution[]
 }
 
 model Transaction {
-  id String @id @unique
-  nonce BigInt @unique
-  raw Bytes
-  lastStatus TxResult?
-  statusUpdatedAt DateTime @default(now())
+  id              String    @id @unique
+  nonce           BigInt    @unique
+  raw             Bytes
+  lastStatus      TxResult?
+  statusUpdatedAt DateTime  @default(now())
 
   executions JobExecution[]
 }
 
 model JobExecution {
   jobId String
-  job Job @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id])
 
   transactionId String
-  transaction Transaction @relation(fields: [transactionId], references: [id])
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
 
   retries Int @default(0)
 
@@ -68,6 +68,6 @@ model AuthToken {
 }
 
 model TickerWhitelist {
-  id Int @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
   ticker String @unique
 }
