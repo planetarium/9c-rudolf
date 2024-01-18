@@ -24,6 +24,7 @@ enum TxResult {
 
 model Job {
   id String @id
+  eventId String?
   actionType ActionType
   address String
   ticker String
