@@ -104,6 +104,7 @@ export const IsTicker =
       },
       validator: {
         validate(value: string) {
+          if (typeof value !== 'string') return false;
           return isAvatarCurrency(value) || isAgentCurrency(value);
         },
       },
@@ -123,6 +124,7 @@ export const IsAvatarCurrency =
       },
       validator: {
         validate(value: string) {
+          if (typeof value !== 'string') return false;
           return isAvatarCurrency(value);
         },
       },
@@ -142,6 +144,7 @@ export const IsAgentCurrency =
       },
       validator: {
         validate(value: string) {
+          if (typeof value !== 'string') return false;
           return isAgentCurrency(value);
         },
       },
