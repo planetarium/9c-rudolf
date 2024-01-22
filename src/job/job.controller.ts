@@ -4,6 +4,7 @@ import { CreateClaimItemsDto } from './dto/create-claim-items.dto';
 import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
 import { RequireAuthToken } from 'src/common/decorators/required-auth-token.decorator';
 import { AuthGuard } from 'src/common/guards/auth.guard';
+import { CreateClaimItemsEventDto } from './dto/create-claim-items-event.dto';
 
 @UseGuards(AuthGuard)
 @Controller('jobs')
@@ -28,6 +29,14 @@ export class JobController {
         amount: job.amount,
       },
     };
+  }
+
+  @Post('events')
+  @RequireAuthToken()
+  public async createJobsByEvent(@Body() dto: CreateClaimItemsEventDto) {
+    const job = await this.jobService.createJobsByEvent(dto);
+
+    return job;
   }
 
   @Post('claim-items')

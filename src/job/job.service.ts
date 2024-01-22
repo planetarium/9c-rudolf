@@ -11,6 +11,8 @@ import { getCurrency } from 'src/utils/currency';
 import { JobStatus, getJobStatusFromTxResult } from './job-status.entity';
 import { TxService } from 'src/tx/tx.service';
 import { Job, TxResult } from '@prisma/client';
+import { CreateClaimItemsEventDto } from './dto/create-claim-items-event.dto';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class JobService {
@@ -52,6 +54,33 @@ export class JobService {
       currency,
       jobSequence,
     };
+  }
+
+  async createJobsByEvent(dto: CreateClaimItemsEventDto) {
+    const targetTickers = [...new Set(dto.items.map((item) => item.ticker))];
+    const whitelist = await this.prismaService.tickerWhitelist.findMany({
+      where: { ticker: { in: targetTickers } },
+    });
+    if (whitelist.length !== targetTickers.length)
+      throw new BadRequestException('Ticker not whitelisted');
+
+    return await this.prismaService.$transaction(async (tx) => {
+      const isExisting = await tx.job.findFirst({
+        where: { eventId: dto.eventId },
+      });
+      if (isExisting) throw new BadRequestException('Event already exists');
+
+      return await tx.job.createMany({
+        data: dto.items.map((item) => ({
+          id: randomUUID(),
+          eventId: dto.eventId,
+          actionType: 'CLAIM_ITEMS',
+          address: item.avatarAddress,
+          ticker: item.ticker,
+          amount: item.amount,
+        })),
+      });
+    });
   }
 
   async createClaimItems(dto: CreateClaimItemsDto) {
