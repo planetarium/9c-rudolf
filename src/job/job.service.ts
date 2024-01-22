@@ -79,7 +79,7 @@ export class JobService {
   }
 
   async createJobsByEvent(dto: CreateClaimItemsEventDto) {
-    const targetTickers = dto.items.map((item) => item.ticker);
+    const targetTickers = [...new Set(dto.items.map((item) => item.ticker))];
     const whitelist = await this.prismaService.tickerWhitelist.findMany({
       where: { ticker: { in: targetTickers } },
     });
