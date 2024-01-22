@@ -31,6 +31,13 @@ export class JobController {
     };
   }
 
+  @Get('events/:id')
+  public async getJobsByEvent(@Param('id') id: string) {
+    const jobs = await this.jobService.getJobsByEvent(id);
+
+    return jobs;
+  }
+
   @Post('events')
   @RequireAuthToken()
   public async createJobsByEvent(@Body() dto: CreateClaimItemsEventDto) {

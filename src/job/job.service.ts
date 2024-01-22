@@ -56,6 +56,28 @@ export class JobService {
     };
   }
 
+  async getJobsByEvent(eventId: string) {
+    const jobs = await this.prismaService.job.findMany({
+      where: { eventId },
+      include: {
+        executions: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          include: { transaction: true },
+        },
+      },
+    });
+
+    return jobs.map((job) => ({
+      ...job,
+      executions: job.executions.map((execution) => ({
+        retries: execution.retries,
+        transactionId: execution.transactionId ?? null,
+        status: execution.transaction?.lastStatus ?? null,
+      })),
+    }));
+  }
+
   async createJobsByEvent(dto: CreateClaimItemsEventDto) {
     const targetTickers = dto.items.map((item) => item.ticker);
     const whitelist = await this.prismaService.tickerWhitelist.findMany({
