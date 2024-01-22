@@ -68,14 +68,7 @@ export class JobService {
       },
     });
 
-    return jobs.map((job) => ({
-      ...job,
-      executions: job.executions.map((execution) => ({
-        retries: execution.retries,
-        transactionId: execution.transactionId ?? null,
-        status: execution.transaction?.lastStatus ?? null,
-      })),
-    }));
+    return jobs;
   }
 
   async createJobsByEvent(dto: CreateClaimItemsEventDto) {

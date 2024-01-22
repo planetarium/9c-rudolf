@@ -35,7 +35,20 @@ export class JobController {
   public async getJobsByEvent(@Param('id') id: string) {
     const jobs = await this.jobService.getJobsByEvent(id);
 
-    return jobs;
+    return {
+      id,
+      jobs: jobs.map((job) => ({
+        id: job.id,
+        actionType: job.actionType,
+        avatarAddress: job.address,
+        ticker: job.ticker,
+        amount: job.amount,
+        status: job.executions[0]?.transaction?.lastStatus ?? null,
+        transactionId: job.executions[0]?.transactionId ?? null,
+        transactionStatus: job.executions[0]?.transaction?.lastStatus ?? null,
+        retries: job.executions[0]?.retries ?? 0,
+      })),
+    };
   }
 
   @Post('events')
