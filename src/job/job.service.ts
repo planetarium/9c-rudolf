@@ -87,7 +87,7 @@ export class JobService {
 
       return await tx.job.createMany({
         data: dto.items.map((item) => ({
-          id: randomUUID(),
+          id: item.id ?? randomUUID(),
           eventId: dto.eventId,
           actionType: 'CLAIM_ITEMS',
           address: item.avatarAddress,

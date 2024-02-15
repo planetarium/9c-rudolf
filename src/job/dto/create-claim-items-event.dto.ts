@@ -7,6 +7,7 @@ import {
   IsHexadecimal,
   IsNumberString,
   IsObject,
+  IsOptional,
   IsString,
   Length,
   ValidateNested,
@@ -14,6 +15,10 @@ import {
 import { IsAvatarCurrency } from 'src/utils/currency';
 
 export class Item {
+  @IsOptional()
+  @IsString()
+  public id?: string;
+
   @IsDefined()
   @IsString()
   @IsHexadecimal()
