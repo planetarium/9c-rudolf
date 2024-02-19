@@ -6,7 +6,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { TxService } from 'src/tx/tx.service';
 
 const DEFAULT_TX_ACTIONS_SIZE = 100;
-const JOT_RETRY_LIMIT = 0;
+const JOT_RETRY_LIMIT = 1;
 
 @Injectable()
 export class QueueService {
