@@ -3,9 +3,10 @@ import { TransactionService } from './transaction.service';
 import { TransactionController } from './transaction.controller';
 import { TransactionCronController } from './transaction.cron';
 import { TxModule } from 'src/tx/tx.module';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
-  imports: [TxModule],
+  imports: [TxModule, PrismaModule],
   providers: [TransactionService, TransactionCronController],
   controllers: [TransactionController],
 })
