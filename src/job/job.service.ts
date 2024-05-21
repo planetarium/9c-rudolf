@@ -72,13 +72,6 @@ export class JobService {
   }
 
   async createJobsByEvent(dto: CreateClaimItemsEventDto) {
-    const targetTickers = [...new Set(dto.items.map((item) => item.ticker))];
-    const whitelist = await this.prismaService.tickerWhitelist.findMany({
-      where: { ticker: { in: targetTickers } },
-    });
-    if (whitelist.length !== targetTickers.length)
-      throw new BadRequestException('Ticker not whitelisted');
-
     return await this.prismaService.$transaction(async (tx) => {
       const isExisting = await tx.job.findFirst({
         where: { eventId: dto.eventId },
@@ -99,11 +92,6 @@ export class JobService {
   }
 
   async createClaimItems(dto: CreateClaimItemsDto) {
-    const whitelist = await this.prismaService.tickerWhitelist.findUnique({
-      where: { ticker: dto.item.ticker },
-    });
-    if (!whitelist) throw new BadRequestException('Ticker not whitelisted');
-
     return await this.prismaService.$transaction(async (tx) => {
       const isExisting = await tx.job.findUnique({
         where: { id: dto.id },
@@ -129,11 +117,6 @@ export class JobService {
   }
 
   async createTransferAssets(dto: CreateTransferAssetsDto) {
-    const whitelist = await this.prismaService.tickerWhitelist.findUnique({
-      where: { ticker: dto.item.ticker },
-    });
-    if (!whitelist) throw new BadRequestException('Ticker not whitelisted');
-
     return await this.prismaService.$transaction(async (tx) => {
       const isExisting = await tx.job.findUnique({
         where: { id: dto.id },
