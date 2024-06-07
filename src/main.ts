@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
 import Decimal from 'decimal.js';
+import { json } from 'express';
 
 // This can be a problem if the number of digits in amount exceeds 9e+14.
 // For details, you can see https://mikemcl.github.io/decimal.js/#toExpPos
@@ -16,6 +17,11 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(new ValidationPipe());
+  app.use(
+    json({
+      limit: '1mb',
+    }),
+  );
 
   await app.listen(3000);
 }
