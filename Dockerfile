@@ -4,7 +4,7 @@ WORKDIR /app
 
 ADD . /app
 
-RUN yarn install
+RUN yarn install --immutable
 
 RUN yarn prisma generate
 
