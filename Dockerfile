@@ -4,6 +4,7 @@ WORKDIR /app
 
 ADD . /app
 
+RUN corepack enable
 RUN yarn install --immutable
 
 RUN yarn prisma generate
