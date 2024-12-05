@@ -40,7 +40,7 @@ export class TxService {
       ),
       new KMSClient(
         nullableAwsAccessKeyId !== undefined &&
-        nullableAwsSecretAccessKey !== undefined
+          nullableAwsSecretAccessKey !== undefined
           ? {
               credentials: {
                 accessKeyId: nullableAwsAccessKeyId,
