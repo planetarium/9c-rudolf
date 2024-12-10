@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { TxModule } from 'src/tx/tx.module';
 import { JobController } from './job.controller';
 import { JobService } from './job.service';
-import { TxModule } from 'src/tx/tx.module';
 
 @Module({
   imports: [TxModule],

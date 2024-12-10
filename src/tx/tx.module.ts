@@ -1,8 +1,8 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { TxService } from './tx.service';
 import { ConfigModule } from '@nestjs/config';
 import { ActionService } from './action.service';
-import { HttpModule } from '@nestjs/axios';
+import { TxService } from './tx.service';
 
 @Module({
   imports: [

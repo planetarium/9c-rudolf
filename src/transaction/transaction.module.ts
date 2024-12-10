@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { TransactionService } from './transaction.service';
+import { TxModule } from 'src/tx/tx.module';
 import { TransactionController } from './transaction.controller';
 import { TransactionCronController } from './transaction.cron';
-import { TxModule } from 'src/tx/tx.module';
+import { TransactionService } from './transaction.service';
 
 @Module({
   imports: [TxModule],

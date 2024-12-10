@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionService } from './transaction.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import type { TransactionService } from './transaction.service';
 
 @Injectable()
 export class TransactionCronController {

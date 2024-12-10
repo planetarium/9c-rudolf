@@ -1,11 +1,11 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { BencodexDictionary } from '@planetarium/bencodex';
 import type { Job } from '@prisma/client';
 import { Decimal } from 'decimal.js';
-import { randomUUID } from 'node:crypto';
 
-import { CURRENCIES } from './tx.constants';
 import type { Address as AddressType } from '@planetarium/account';
+import { CURRENCIES } from './tx.constants';
 
 import { Address } from '@planetarium/account';
 import { encodeCurrency } from '@planetarium/tx';
@@ -100,7 +100,9 @@ export class ActionService {
       guid.split('-').reduce((bytes, section, index) => {
         const bytesInChar = section.match(/.{1,2}/g);
         if (index < 3) bytesInChar.reverse();
-        return bytes.concat(bytesInChar.map((byte) => parseInt(byte, 16)));
+        return bytes.concat(
+          bytesInChar.map((byte) => Number.parseInt(byte, 16)),
+        );
       }, []),
     );
   }

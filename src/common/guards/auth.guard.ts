@@ -1,8 +1,12 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import {
+  type CanActivate,
+  type ExecutionContext,
+  Injectable,
+} from '@nestjs/common';
+import type { Reflector } from '@nestjs/core';
+import type { Request } from 'express';
+import type { PrismaService } from 'src/prisma/prisma.service';
 import { RequireAuthToken } from '../decorators/required-auth-token.decorator';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { Request } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,7 +27,7 @@ export class AuthGuard implements CanActivate {
       }
 
       const splat = header.split(' ');
-      if (splat.length == 2 && splat[0] == 'Bearer') {
+      if (splat.length === 2 && splat[0] === 'Bearer') {
         const authToken = await this.prismaSerivce.authToken.findUnique({
           where: {
             token: splat[1],
