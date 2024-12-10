@@ -10,3 +10,15 @@ apt-get update
 apt-get install postgresql-client -y
 psql $(printenv | grep DATABASE_URL= | sed s/DATABASE_URL=// | sed s/\?schema=public//)
 ```
+
+# 인증 토큰 삭제
+
+```sql
+DELETE FROM "AuthToken" WHERE "token" = '<TOKEN_TO_REMOVE>';
+```
+
+# 인증 토큰 추가
+
+```sql
+INSERT INTO "AuthToken" ("token") VALUES ('<TOKEN_TO_INSERT>');
+```
