@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { QueueService } from './queue.service';
-import { QueueCronController } from './queue.cron';
-import { TxModule } from 'src/tx/tx.module';
 import { ConfigModule } from '@nestjs/config';
 import { makeGaugeProvider } from '@willsoto/nestjs-prometheus';
+import { TxModule } from 'src/tx/tx.module';
+import { QueueCronController } from './queue.cron';
+import { QueueService } from './queue.service';
 
 @Module({
   imports: [TxModule, ConfigModule],

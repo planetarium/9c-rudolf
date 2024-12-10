@@ -1,19 +1,23 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module';
-import { JobModule } from './job/job.module';
-import { ScheduleModule } from '@nestjs/schedule';
-import { QueueModule } from './queue/queue.module';
-import { TransactionModule } from './transaction/transaction.module';
-import { ConfigModule } from '@nestjs/config';
-import { TxModule } from './tx/tx.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import {
+  type MiddlewareConsumer,
+  Module,
+  type NestModule,
+} from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import {
   PrometheusModule,
   makeCounterProvider,
 } from '@willsoto/nestjs-prometheus';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { HttpResponseMiddleware } from './http-response.middleware';
+import { JobModule } from './job/job.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { QueueModule } from './queue/queue.module';
+import { TransactionModule } from './transaction/transaction.module';
+import { TxModule } from './tx/tx.module';
 
 @Module({
   imports: [

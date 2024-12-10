@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { TransactionService } from './transaction.service';
+import type { TransactionService } from './transaction.service';
 
 @Controller('transactions')
 export class TransactionController {

@@ -1,4 +1,4 @@
-import { TxResult } from '@prisma/client';
+import type { TxResult } from '@prisma/client';
 
 export enum JobStatus {
   PENDING = 'PENDING',

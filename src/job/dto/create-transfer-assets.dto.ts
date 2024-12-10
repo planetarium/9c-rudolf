@@ -1,13 +1,13 @@
 import { Type } from 'class-transformer';
 import {
+  IsDefined,
+  IsHexadecimal,
+  IsNumberString,
   IsObject,
   IsString,
+  Length,
   ValidateIf,
   ValidateNested,
-  IsHexadecimal,
-  Length,
-  IsDefined,
-  IsNumberString,
 } from 'class-validator';
 import {
   IsTicker,

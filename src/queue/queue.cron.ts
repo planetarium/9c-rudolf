@@ -1,10 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { QueueService } from './queue.service';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import { Gauge } from 'prom-client';
+import type { Cache } from 'cache-manager';
+import type { Gauge } from 'prom-client';
+import type { QueueService } from './queue.service';
 
 const handleCronLock = 'HANDLE_CRON_LOCK';
 const handleStagingCronLock = 'HANDLE_STAGING_CRON_LOCK';

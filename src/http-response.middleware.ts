@@ -1,7 +1,7 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, type NestMiddleware } from '@nestjs/common';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import { Request, Response } from 'express';
-import { Counter } from 'prom-client';
+import type { Request, Response } from 'express';
+import type { Counter } from 'prom-client';
 
 @Injectable()
 export class HttpResponseMiddleware implements NestMiddleware {
@@ -12,7 +12,7 @@ export class HttpResponseMiddleware implements NestMiddleware {
     private readonly httpResponseCounter: Counter<string>,
   ) {}
 
-  use(req: Request, res: Response, next: (error?: any) => void) {
+  use(req: Request, res: Response, next: (error?: unknown) => void) {
     if (req.baseUrl === '/metrics') return next();
 
     this.httpRequestCounter
