@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { TxResult } from '@prisma/client';
 import { getJobStatusFromTxResult } from 'src/job/job-status.entity';
-import type { PrismaService } from 'src/prisma/prisma.service';
-import type { TxService } from 'src/tx/tx.service';
+import  { PrismaService } from 'src/prisma/prisma.service';
+import  { TxService } from 'src/tx/tx.service';
 
 const UPDATE_TRANSACTIONS_SIZE = 10;
 

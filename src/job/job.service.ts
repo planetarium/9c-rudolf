@@ -6,12 +6,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { Job, TxResult } from '@prisma/client';
-import type { PrismaService } from 'src/prisma/prisma.service';
-import type { TxService } from 'src/tx/tx.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { TxService } from 'src/tx/tx.service';
 import { getCurrency } from 'src/utils/currency';
-import type { CreateClaimItemsEventDto } from './dto/create-claim-items-event.dto';
-import type { CreateClaimItemsDto } from './dto/create-claim-items.dto';
-import type { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
+import { CreateClaimItemsEventDto } from './dto/create-claim-items-event.dto';
+import { CreateClaimItemsDto } from './dto/create-claim-items.dto';
+import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
 import { JobStatus, getJobStatusFromTxResult } from './job-status.entity';
 
 @Injectable()

@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { RequireAuthToken } from 'src/common/decorators/required-auth-token.decorator';
 import { AuthGuard } from 'src/common/guards/auth.guard';
-import type { CreateClaimItemsEventDto } from './dto/create-claim-items-event.dto';
-import type { CreateClaimItemsDto } from './dto/create-claim-items.dto';
-import type { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
-import type { JobService } from './job.service';
+import { CreateClaimItemsEventDto } from './dto/create-claim-items-event.dto';
+import { CreateClaimItemsDto } from './dto/create-claim-items.dto';
+import { CreateTransferAssetsDto } from './dto/create-transfer-assets.dto';
+import { JobService } from './job.service';
 
 @UseGuards(AuthGuard)
 @Controller('jobs')

@@ -1,11 +1,11 @@
 import {
-  type CanActivate,
-  type ExecutionContext,
+  CanActivate,
+  ExecutionContext,
   Injectable,
 } from '@nestjs/common';
-import type { Reflector } from '@nestjs/core';
-import type { Request } from 'express';
-import type { PrismaService } from 'src/prisma/prisma.service';
+import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { RequireAuthToken } from '../decorators/required-auth-token.decorator';
 
 @Injectable()

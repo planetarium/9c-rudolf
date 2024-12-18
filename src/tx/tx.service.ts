@@ -1,16 +1,16 @@
 import { createHash } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import type { Account } from '@planetarium/account';
 import { BencodexDictionary, type Value, encode } from '@planetarium/bencodex';
 import type { UnsignedTx } from '@planetarium/tx/dist/tx';
 import type { Job, TxResult } from '@prisma/client';
 
-import type { HttpService } from '@nestjs/axios';
+import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import type { ActionService } from './action.service';
+import { ActionService } from './action.service';
 import { CURRENCIES, SUPER_FUTURE_DATETIME } from './tx.constants';
-import type { Tx } from './tx.entity';
+import { Tx } from './tx.entity';
 
 import { Address, PublicKey } from '@planetarium/account';
 import { AwsKmsAccount, KMSClient } from '@planetarium/account-aws-kms';
