@@ -9,6 +9,13 @@
       "indentStyle": "space"
     }
   },
+  "linter": {
+    "rules": {
+      "style": {
+        "useImportType": "off"
+      }
+    }
+  },
   "json": {
     "formatter": {
       "indentStyle": "space"

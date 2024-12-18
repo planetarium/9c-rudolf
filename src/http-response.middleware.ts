@@ -1,7 +1,7 @@
-import { Injectable, type NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { InjectMetric } from '@willsoto/nestjs-prometheus';
-import type { Request, Response } from 'express';
-import type { Counter } from 'prom-client';
+import { Request, Response } from 'express';
+import { Counter } from 'prom-client';
 
 @Injectable()
 export class HttpResponseMiddleware implements NestMiddleware {

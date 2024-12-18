@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 import { ActionType, type Job, Prisma } from '@prisma/client';
 
-import type { PrismaService } from 'src/prisma/prisma.service';
-import type { TxService } from 'src/tx/tx.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { TxService } from 'src/tx/tx.service';
 
 const DEFAULT_TX_ACTIONS_SIZE = 100;
 const JOT_RETRY_LIMIT = 1;

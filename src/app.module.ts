@@ -1,8 +1,8 @@
 import { CacheModule } from '@nestjs/cache-manager';
 import {
-  type MiddlewareConsumer,
+  MiddlewareConsumer,
   Module,
-  type NestModule,
+  NestModule,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
